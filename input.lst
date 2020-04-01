@@ -1,0 +1,104 @@
+   1 0000               #
+   2 0000               # @author Brendan Kapp (bek7883)
+   3 0000               #
+   4 0000               # All input is handled in this file
+   5 0000               #
+   6 0000               PRINT_STRING = 4
+   7 0000               READ_INT = 5
+   8 0000               PRINT_INT = 1
+   9 0000               READ_STRING = 12
+  10 0000               
+  11 0000               	.data
+  12 0000               input_data:
+  13 0000 00000000		.word	0, 0, 0
+     0004 00000000
+     0008 00000000
+  14 000c               
+  15 0000               	.text
+  16 0000               	.align 2
+  17 0000               
+  18 0000               	.globl	input
+  19 0000               	.globl	main
+  20 0000               #
+  21 0000               # input
+  22 0000               #	paramets: none	
+  23 0000               #	returns: v0 (-1 for fail, address of data for success)
+  24 0000               #
+  25 0000               input:
+  26 0000               						# no stack allocations as it
+  27 0000               						#  is not needed for this
+  28 0000 34080002		li	$t0, 2			
+  29 0004 3C090000		la	$t1, input_data
+     0008 35290000
+  30 000c               						# empty input
+  31 000c 240BFFFF		li	$t3, -1
+  32 0010 AD2B0000		sw	$t3, 0($t1)
+  33 0014 AD2B0004		sw	$t3, 4($t1)
+  34 0018 AD2B0008		sw	$t3, 8($t1)
+  35 001c               read_input_loop:
+  36 001c 34020005		li	$v0, READ_INT			# read input
+  37 0020 0000000C		syscall
+  38 0024 AD220000		sw	$v0, 0($t1)
+  39 0028 21290004		addi	$t1, $t1, 4			# update pointer
+  40 002c 2108FFFF		addi	$t0, $t0, -1
+  41 0030 11000001		beq	$t0, $zero, read_input_text	# branch after 3
+  42 0034 08000007		j	read_input_loop
+  43 0038               read_input_text:
+  44 0038 3402000C		li	$v0, READ_STRING
+  45 003c 3C090000		la	$t1, input_data
+     0040 35290000
+  46 0044 0000000C		syscall
+  47 0048 AD220008		sw	$v0, 8($t1)
+  48 004c               read_input_done:
+  49 004c               						# validate data
+  50 004c 3C090000		la	$t1, input_data			# data address
+     0050 35290000
+  51 0054               						# check size (4 <= 30)
+  52 0054 340A0004		li	$t2, 4
+  53 0058 340B001E		li	$t3, 30
+  54 005c 8D2C0000		lw	$t4, 0($t1)
+  55 0060 018A682A		slt	$t5, $t4, $t2
+  56 0064 15A00016		bne	$t5, $zero, read_input_fail
+  57 0068 016C682A		slt	$t5, $t3, $t4
+  58 006c 15A00014		bne	$t5, $zero, read_input_fail
+  59 0070               						# check generations (0 <= 20)
+  60 0070 340A0000		li	$t2, 0
+  61 0074 340B0014		li	$t3, 20
+  62 0078 8D2C0004		lw	$t4, 4($t1)
+  63 007c 018A682A		slt	$t5, $t4, $t2
+  64 0080 15A0000F		bne	$t5, $zero, read_input_fail
+  65 0084 016C682A		slt	$t5, $t3, $t4
+  66 0088 15A0000D		bne	$t5, $zero, read_input_fail	
+  67 008c               						# check wind (N, S, E, W)
+  68 008c               						# (78, 83, 69, 87)
+  69 008c 340A004E		li	$t2, 78
+  70 0090 8D2C0008		lw	$t4, 8($t1)
+  71 0094 118A0007		beq	$t4, $t2, read_input_pass
+  72 0098 340A0053		li	$t2, 83
+  73 009c 118A0005		beq	$t4, $t2, read_input_pass
+  74 00a0 340A0045		li	$t2, 69
+  75 00a4 118A0003		beq	$t4, $t2, read_input_pass
+  76 00a8 340A0057		li	$t2, 87
+  77 00ac 118A0001		beq	$t4, $t2, read_input_pass
+  78 00b0 08000030		j	read_input_fail
+  79 00b4               read_input_pass:
+  80 00b4 3C020000		la	$v0, input_data			# return the data address
+     00b8 34420000
+  81 00bc 03E00008		jr	$ra
+  82 00c0               read_input_fail:
+  83 00c0 2402FFFF		la	$v0, -1				# return an error code
+  84 00c4 03E00008		jr	$ra
+
+
+PRINT_INT        = 00000001   
+PRINT_STRING     = 00000004   
+READ_INT         = 00000005   
+READ_STRING      = 0000000C   
+input              00000000 RG text 
+input_data         00000000 R  data 
+main               ******** XG
+read_input_done    0000004C R  text 
+read_input_fail    000000C0 R  text 
+read_input_loop    0000001C R  text 
+read_input_pass    000000B4 R  text 
+read_input_text    00000038 R  text 

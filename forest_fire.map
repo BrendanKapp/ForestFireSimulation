@@ -1,0 +1,55 @@
+Load map
+========
+
+Module:  forest_fire.obj
+ Text segment:  116 bytes, load point 0x00400000
+ Data segment:  32 bytes, load point 0x10000000
+ Symbols:
+                Name Section Mode    Value
+       input_success   Text   R   0x00400030
+            READ_INT          A   0x00000005
+        input_failed   Text   R   0x0040001c
+             newline   Data   R   0x1000001c
+        PRINT_STRING          A   0x00000004
+                main   Text   RG  0x00400000
+  input_success_text   Data   R   0x1000000e
+           main_done   Text   R   0x00400060
+   input_failed_text   Data   R   0x10000000
+           PRINT_INT          A   0x00000001
+
+Module:  input.obj
+ Text segment:  200 bytes, load point 0x00400074
+ Data segment:  16 bytes, load point 0x10000020
+ Symbols:
+                Name Section Mode    Value
+               input   Text   RG  0x00400074
+     read_input_loop   Text   R   0x00400090
+            READ_INT          A   0x00000005
+        PRINT_STRING          A   0x00000004
+     read_input_pass   Text   R   0x00400128
+          input_data   Data   R   0x10000020
+     read_input_done   Text   R   0x004000c0
+     read_input_text   Text   R   0x004000ac
+     read_input_fail   Text   R   0x00400134
+         READ_STRING          A   0x0000000c
+           PRINT_INT          A   0x00000001
+
+Module:  output.obj
+
+Module:  grid.obj
+ Text segment:  76 bytes, load point 0x0040013c
+ Data segment:  4104 bytes, load point 0x10000030
+ Symbols:
+                Name Section Mode    Value
+           grid_data   Data   R   0x10000030
+            grid_get   Text   RG  0x00400140
+          after_grid   Data   R   0x10001030
+         grid_create   Text   RG  0x0040013c
+            grid_set   Text   RG  0x00400164
+
+Module:  r2k_startup.obj
+ Text segment:  36 bytes, load point 0x00400188
+ Symbols:
+                Name Section Mode    Value
+           SYS_EXIT2          A   0x00000011
+      __r2k__entry__   Text   RG  0x0040018c

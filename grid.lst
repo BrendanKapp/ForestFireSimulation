@@ -1,0 +1,84 @@
+   1 0000               #
+   2 0000               # @author Brendan Kapp (bek7883)
+   3 0000               #
+   4 0000               # This file handles all the grid management (get, set, create, close, etc.)
+   5 0000               #
+   6 0000               
+   7 0000               #
+   8 0000               # DATA
+   9 0000               #
+  10 0000               	.data
+  11 0000               	.align	2
+  12 0000               grid_data:	
+  13 0000 00000000		.word	0:1024
+     0004 00000000
+     0008 00000000
+     000c 00000000
+     0010 00000000
+     0014 00000000
+  14 1000               after_grid:
+  15 1000 00000001		.word	1
+  16 1004               #
+  17 1004               # CODE
+  18 1004               #	
+  19 0000               	.text
+  20 0000               	.align	2
+  21 0000               	.globl	grid_create
+  22 0000               	.globl	grid_get
+  23 0000               	.globl	grid_set
+  24 0000               #
+  25 0000               # assigns 0's to the entire grid of memory to be used
+  26 0000               # grid builds from the top left outwards but always uses a 32x32 grid
+  27 0000               # this enables the movement vertically to be done by +/- 32
+  28 0000               # to move horizontally +/- 1
+  29 0000               # parameters: a0 (x size), a1 (y size)
+  30 0000               # returns: v0 (0 for fail)
+  31 0000               #
+  32 0000               grid_create:
+  33 0000               	# not implemented yet
+  34 0000 03E00008		jr	$ra
+  35 0004               #
+  36 0004               # grid_get will return the value at (a0, a1)
+  37 0004               # parameters: a0 (x location), a1 (y location)
+  38 0004               # returns: v0 (returns value, 0 for fail)
+  39 0004               #
+  40 0004               grid_get:
+  41 0004 3C080000		la	$t0, grid_data
+     0008 35080000
+  42 000c               						# to retrieve a value:
+  43 000c               						#  mem = 32 * y + x
+  44 000c 34010020		mul	$t1, $a1, 32
+     0010 00A10018
+     0014 00004812
+  45 0018 01245020		add	$t2, $t1, $a0			# t2 is the offset
+  46 001c 01485820		add	$t3, $t2, $t0			# t3 is the address 
+  47 0020               
+  48 0020 8D620000		lw	$v0, 0($t3)
+  49 0024               	
+  50 0024 03E00008		jr	$ra
+  51 0028               #
+  52 0028               # grid_set will set the value at (a0, a1)
+  53 0028               # parameters: a0 (x location), a1 (y location), a2 (value)
+  54 0028               # returns: nothing
+  55 0028               #
+  56 0028               grid_set:
+  57 0028 3C080000		la	$t0, grid_data
+     002c 35080000
+  58 0030               						# to retrieve a value:
+  59 0030               						#  mem = 32 * y + x
+  60 0030 34010020		mul	$t1, $a1, 32
+     0034 00A10018
+     0038 00004812
+  61 003c 01245020		add	$t2, $t1, $a0			# t2 is the offset
+  62 0040 01485820		add	$t3, $t2, $t0			# t3 is the address 
+  63 0044               
+  64 0044 AD660000		sw	$a2, 0($t3)	
+  65 0048               		
+  66 0048 03E00008		jr	$ra
+
+
+after_grid     00001000 R  data 
+grid_create    00000000 RG text 
+grid_data      00000000 R  data 
+grid_get       00000004 RG text 
+grid_set       00000028 RG text 
