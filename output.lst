@@ -3,5 +3,241 @@
    3 0000               #
    4 0000               # All output is handled in this file
    5 0000               #
+   6 0000               
+   7 0000               PRINT_STRING = 4
+   8 0000               PRINT_INT = 1
+   9 0000               
+  10 0000               #
+  11 0000               # DATA
+  12 0000               #
+  13 0000               	.data
+  14 0000               banner_text:
+  15 0000 2B2D2D2D		.ascii	"+-------------+\n"
+          2D2D2D2D
+          2D2D2D2D
+          2D2D2B0A
+  16 0010 7C20464F		.ascii	"| FOREST FIRE |\n"
+          52455354
+          20464952
+          45207C0A
+  17 0020 2B2D2D2D		.asciiz	"+-------------+\n"
+          2D2D2D2D
+          2D2D2D2D
+          2D2D2B0A
+          00      
+  18 0031               gen_banner1_text:
+  19 0031 3D3D3D3D		.asciiz	"==== #"
+          202300  
+  20 0038               gen_banner2_text:
+  21 0038 203D3D3D		.asciiz	" ====\n"
+          3D0A00  
+  22 003f               blank_line_text:
+  23 003f 0A00    		.asciiz	"\n"
+  24 0041               bar_text:
+  25 0041 7C00    		.asciiz	"|"
+  26 0043               plus_text:
+  27 0043 2B00    		.asciiz	"+"
+  28 0045               minus_text:
+  29 0045 2D00    		.asciiz	"-"
+  30 0047               error_text:
+  31 0047 4500    		.asciiz	"E"
+  32 0049               grass_text:
+  33 0049 2E00    		.asciiz	"."
+  34 004b               tree_text:
+  35 004b 7400    		.asciiz	"t"
+  36 004d               burning_text:
+  37 004d 4200    		.asciiz	"B"
+  38 004f               #
+  39 004f               # CODE
+  40 004f               #
+  41 0000               	.text
+  42 0000               	.align	2
+  43 0000               	.globl	grid_get
+  44 0000               	.globl	print_banner
+  45 0000               	.globl	print_grid
+  46 0000               #
+  47 0000               # print the initial banner
+  48 0000               # parameters: none
+  49 0000               # returns: none
+  50 0000               #
+  51 0000               print_banner:
+  52 0000 34020004		li	$v0, PRINT_STRING
+  53 0004 3C040000		la	$a0, banner_text
+     0008 34840000
+  54 000c 0000000C		syscall
+  55 0010 0C000064		jal	print_blank_line
+  56 0014 03E00008		jr	$ra
+  57 0018               
+  58 0018               #
+  59 0018               # prints the initial gridx
+  60 0018               # parameters: a0 (grid address), a1 (generation number), a2 (grid size)
+  61 0018               # returns: none
+  62 0018               #
+  63 0018               print_grid:
+  64 0018 23BDFFE4		addi	$sp, $sp, -28
+  65 001c AFBF0018		sw	$ra, 24($sp)
+  66 0020 AFB50014		sw	$s5, 20($sp)
+  67 0024 AFB40010		sw	$s4, 16($sp)
+  68 0028 AFB3000C		sw	$s3, 12($sp)
+  69 002c AFB20008		sw	$s2, 8($sp)
+  70 0030 AFB10004		sw	$s1, 4($sp)
+  71 0034 AFB00000		sw	$s0, 0($sp)
+  72 0038               					# print generation number banner
+  73 0038 00808021		move	$s0, $a0
+  74 003c 00A08821		move	$s1, $a1
+  75 0040 00C09021		move	$s2, $a2
+  76 0044 34020004		li	$v0, PRINT_STRING
+  77 0048 3C040000		la	$a0, gen_banner1_text
+     004c 34840000
+  78 0050 0000000C		syscall
+  79 0054               
+  80 0054 34020001		li	$v0, PRINT_INT
+  81 0058 02202021		move	$a0, $s1	
+  82 005c 0000000C		syscall
+  83 0060               
+  84 0060 34020004		li	$v0, PRINT_STRING
+  85 0064 3C040000		la	$a0, gen_banner2_text
+     0068 34840000
+  86 006c 0000000C		syscall
+  87 0070               					# print grid	
+  88 0070               			
+  89 0070 34140000		li	$s4, 0			# x counter
+  90 0074 34150000		li	$s5, 0			# y counter
+  91 0078 0C00003C		jal	print_board_edge	
+  92 007c               y_loop:
+  93 007c 0C00004E		jal	print_value	
+  94 0080 22B50001		addi	$s5, $s5, 1
+  95 0084 12B2000F		beq	$s5, $s2, finish
+  96 0088               x_loop:
+  97 0088 02802021		move	$a0, $s4
+  98 008c 02A02821		move	$a1, $s5
+  99 0090 0C00004E		jal	print_value	
+ 100 0094 22940001		addi	$s4, $s4, 1
+ 101 0098 12920001		beq	$s4, $s2, y_loop_next
+ 102 009c 08000022		j	x_loop
+ 103 00a0               y_loop_next:
+ 104 00a0 34020004		li	$v0, PRINT_STRING
+ 105 00a4 3C040000		la	$a0, bar_text
+     00a8 34840000
+ 106 00ac 0000000C		syscall
+ 107 00b0 34020004		li	$v0, PRINT_STRING
+ 108 00b4 3C040000		la	$a0, blank_line_text
+     00b8 34840000
+ 109 00bc 0000000C		syscall
+ 110 00c0 0800001F		j	y_loop
+ 111 00c4               finish:
+ 112 00c4               					# print blank line and finish
+ 113 00c4 0C00003C		jal	print_board_edge
+ 114 00c8 0C000064		jal	print_blank_line
+ 115 00cc 8FB00000		lw	$s0, 0($sp)
+ 116 00d0 8FB10004		lw	$s1, 4($sp)
+ 117 00d4 8FB20008		lw	$s2, 8($sp)
+ 118 00d8 8FB3000C		lw	$s3, 12($sp)
+ 119 00dc 8FB40010		lw	$s4, 16($sp)
+ 120 00e0 8FB50014		lw	$s5, 20($sp)
+ 121 00e4 8FBF0018		lw	$ra, 24($sp)
+ 122 00e8 23BD001C		addi	$sp, $sp, 28
+ 123 00ec 03E00008		jr	$ra
+ 124 00f0               #
+ 125 00f0               # prints the edge of the board, specifically the upper and lower edges
+ 126 00f0               # formate: +------+ (with the number of minuses = grid size)
+ 127 00f0               # parameters: a0 (how wide is the board)
+ 128 00f0               # returns: none
+ 129 00f0               #
+ 130 00f0               print_board_edge:
+ 131 00f0 00804021		move	$t0, $a0
+ 132 00f4 34020004		li	$v0, PRINT_STRING
+ 133 00f8 3C040000		la	$a0, plus_text
+     00fc 34840000
+ 134 0100 0000000C		syscall
+ 135 0104               edge_loop:
+ 136 0104 34020004		li	$v0, PRINT_STRING
+ 137 0108 3C040000		la	$a0, minus_text
+     010c 34840000
+ 138 0110 0000000C		syscall
+ 139 0114 11000002		beq	$t0, $zero, finish_edge
+ 140 0118 2108FFFF		addi	$t0, $t0, -1
+ 141 011c 08000041		j	edge_loop
+ 142 0120               finish_edge:
+ 143 0120 34020004		li	$v0, PRINT_STRING
+ 144 0124 3C040000		la	$a0, plus_text
+     0128 34840000
+ 145 012c 0000000C		syscall
+ 146 0130 0C000064		jal	print_blank_line
+ 147 0134 03E00008		jr	$ra
+ 148 0138               
+ 149 0138               #
+ 150 0138               # prints the value at a specific (x, y) cordinate on the board
+ 151 0138               # parameters: a0 (x), a1 (y)
+ 152 0138               # returns: none
+ 153 0138               #
+ 154 0138               print_value:
+ 155 0138 0C000000		jal	grid_get
+ 156 013c 00404021		move	$t0, $v0
+ 157 0140 34090001		li	$t1, 1
+ 158 0144 11090007		beq	$t0, $t1, print_grass
+ 159 0148 34090002		li	$t1, 2
+ 160 014c 11090008		beq	$t0, $t1, print_tree
+ 161 0150 34090003		li	$t1, 3
+ 162 0154 11090009		beq	$t0, $t1, print_burning
+ 163 0158               print_error:
+ 164 0158 3C040000		la	$a0, error_text
+     015c 34840000
+ 165 0160 08000061		j	print_value_final
+ 166 0164               print_grass:
+ 167 0164 3C040000		la	$a0, grass_text
+     0168 34840000
+ 168 016c 08000061		j	print_value_final
+ 169 0170               print_tree:
+ 170 0170 3C040000		la	$a0, tree_text
+     0174 34840000
+ 171 0178 08000061		j	print_value_final
+ 172 017c               print_burning:
+ 173 017c 3C040000		la	$a0, burning_text
+     0180 34840000
+ 174 0184               print_value_final:
+ 175 0184 34020004		li	$v0, PRINT_STRING
+ 176 0188 0000000C		syscall
+ 177 018c 03E00008		jr	$ra
+ 178 0190               	
+ 179 0190               #
+ 180 0190               # prints a blank line
+ 181 0190               #
+ 182 0190               print_blank_line:
+ 183 0190 34020004		li	$v0, PRINT_STRING
+ 184 0194 3C040000		la	$a0, blank_line_text
+     0198 34840000
+ 185 019c 0000000C		syscall
+ 186 01a0 03E00008		jr	$ra
 
 
+PRINT_INT          = 00000001   
+PRINT_STRING       = 00000004   
+banner_text          00000000 R  data 
+bar_text             00000041 R  data 
+blank_line_text      0000003F R  data 
+burning_text         0000004D R  data 
+edge_loop            00000104 R  text 
+error_text           00000047 R  data 
+finish               000000C4 R  text 
+finish_edge          00000120 R  text 
+gen_banner1_text     00000031 R  data 
+gen_banner2_text     00000038 R  data 
+grass_text           00000049 R  data 
+grid_get             ******** XG
+minus_text           00000045 R  data 
+plus_text            00000043 R  data 
+print_banner         00000000 RG text 
+print_blank_line     00000190 R  text 
+print_board_edge     000000F0 R  text 
+print_burning        0000017C R  text 
+print_error          00000158 R  text 
+print_grass          00000164 R  text 
+print_grid           00000018 RG text 
+print_tree           00000170 R  text 
+print_value          00000138 R  text 
+print_value_final    00000184 R  text 
+tree_text            0000004B R  data 
+x_loop               00000088 R  text 
+y_loop               0000007C R  text 
+y_loop_next          000000A0 R  text 

@@ -10,7 +10,7 @@ READ_STRING = 12
 
 	.data
 input_data:
-	.word	0, 0, 0
+	.word	0, 0, 0				# size, generations, wind
 
 	.text
 	.align 2

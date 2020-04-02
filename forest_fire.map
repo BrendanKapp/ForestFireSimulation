@@ -2,54 +2,93 @@ Load map
 ========
 
 Module:  forest_fire.obj
- Text segment:  116 bytes, load point 0x00400000
+ Text segment:  216 bytes, load point 0x00400000
  Data segment:  32 bytes, load point 0x10000000
  Symbols:
                 Name Section Mode    Value
-       input_success   Text   R   0x00400030
+     main_loop_start   Text   R   0x00400074
+       input_success   Text   R   0x00400044
             READ_INT          A   0x00000005
-        input_failed   Text   R   0x0040001c
+        input_failed   Text   R   0x00400030
+           main_loop   Text   R   0x00400090
              newline   Data   R   0x1000001c
         PRINT_STRING          A   0x00000004
                 main   Text   RG  0x00400000
   input_success_text   Data   R   0x1000000e
-           main_done   Text   R   0x00400060
+           main_done   Text   R   0x004000b0
    input_failed_text   Data   R   0x10000000
            PRINT_INT          A   0x00000001
 
 Module:  input.obj
- Text segment:  200 bytes, load point 0x00400074
+ Text segment:  200 bytes, load point 0x004000d8
  Data segment:  16 bytes, load point 0x10000020
  Symbols:
                 Name Section Mode    Value
-               input   Text   RG  0x00400074
-     read_input_loop   Text   R   0x00400090
+               input   Text   RG  0x004000d8
+     read_input_loop   Text   R   0x004000f4
             READ_INT          A   0x00000005
         PRINT_STRING          A   0x00000004
-     read_input_pass   Text   R   0x00400128
+     read_input_pass   Text   R   0x0040018c
           input_data   Data   R   0x10000020
-     read_input_done   Text   R   0x004000c0
-     read_input_text   Text   R   0x004000ac
-     read_input_fail   Text   R   0x00400134
+     read_input_done   Text   R   0x00400124
+     read_input_text   Text   R   0x00400110
+     read_input_fail   Text   R   0x00400198
          READ_STRING          A   0x0000000c
            PRINT_INT          A   0x00000001
 
 Module:  output.obj
-
-Module:  grid.obj
- Text segment:  76 bytes, load point 0x0040013c
- Data segment:  4104 bytes, load point 0x10000030
+ Text segment:  420 bytes, load point 0x004001a0
+ Data segment:  80 bytes, load point 0x10000030
  Symbols:
                 Name Section Mode    Value
-           grid_data   Data   R   0x10000030
-            grid_get   Text   RG  0x00400140
-          after_grid   Data   R   0x10001030
-         grid_create   Text   RG  0x0040013c
-            grid_set   Text   RG  0x00400164
+       print_burning   Text   R   0x0040031c
+         print_error   Text   R   0x004002f8
+          print_grid   Text   RG  0x004001b8
+         banner_text   Data   R   0x10000030
+           edge_loop   Text   R   0x004002a4
+          print_tree   Text   R   0x00400310
+          minus_text   Data   R   0x10000075
+            bar_text   Data   R   0x10000071
+    gen_banner2_text   Data   R   0x10000068
+    print_blank_line   Text   R   0x00400330
+           tree_text   Data   R   0x1000007b
+         print_grass   Text   R   0x00400304
+   print_value_final   Text   R   0x00400324
+         finish_edge   Text   R   0x004002c0
+         y_loop_next   Text   R   0x00400240
+        PRINT_STRING          A   0x00000004
+         print_value   Text   R   0x004002d8
+              x_loop   Text   R   0x00400228
+        print_banner   Text   RG  0x004001a0
+    print_board_edge   Text   R   0x00400290
+           plus_text   Data   R   0x10000073
+        burning_text   Data   R   0x1000007d
+              finish   Text   R   0x00400264
+          error_text   Data   R   0x10000077
+          grass_text   Data   R   0x10000079
+    gen_banner1_text   Data   R   0x10000061
+           PRINT_INT          A   0x00000001
+              y_loop   Text   R   0x0040021c
+     blank_line_text   Data   R   0x1000006f
+
+Module:  grid.obj
+ Text segment:  140 bytes, load point 0x00400344
+ Data segment:  8192 bytes, load point 0x10000080
+ Symbols:
+                Name Section Mode    Value
+         inner_cycle   Text   R   0x004003b8
+           grid_data   Data   R   0x10000080
+            grid_get   Text   RG  0x00400350
+        finish_cycle   Text   R   0x004003cc
+         outer_cycle   Text   R   0x004003b4
+          grid_cycle   Text   RG  0x00400398
+       grid_data_old   Data   R   0x10001080
+         grid_create   Text   RG  0x00400344
+            grid_set   Text   RG  0x00400374
 
 Module:  r2k_startup.obj
- Text segment:  36 bytes, load point 0x00400188
+ Text segment:  36 bytes, load point 0x004003d0
  Symbols:
                 Name Section Mode    Value
            SYS_EXIT2          A   0x00000011
-      __r2k__entry__   Text   RG  0x0040018c
+      __r2k__entry__   Text   RG  0x004003d4

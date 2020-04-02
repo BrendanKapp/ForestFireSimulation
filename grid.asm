@@ -2,6 +2,11 @@
 # @author Brendan Kapp (bek7883)
 #
 # This file handles all the grid management (get, set, create, close, etc.)
+# Grid values are as follows:
+# 0 = null
+# 1 = grass
+# 2 = tree
+# 3 = burning tree
 #
 
 #
@@ -11,8 +16,8 @@
 	.align	2
 grid_data:	
 	.word	0:1024
-after_grid:
-	.word	1
+grid_data_old:
+	.word	0:1024
 #
 # CODE
 #	
@@ -21,16 +26,17 @@ after_grid:
 	.globl	grid_create
 	.globl	grid_get
 	.globl	grid_set
+	.globl	grid_cycle
 #
 # assigns 0's to the entire grid of memory to be used
 # grid builds from the top left outwards but always uses a 32x32 grid
 # this enables the movement vertically to be done by +/- 32
 # to move horizontally +/- 1
 # parameters: a0 (x size), a1 (y size)
-# returns: v0 (0 for fail)
+# returns: grid address
 #
 grid_create:
-	# not implemented yet
+	la	$v0, grid_data
 	jr	$ra
 #
 # grid_get will return the value at (a0, a1)
@@ -51,7 +57,7 @@ grid_get:
 #
 # grid_set will set the value at (a0, a1)
 # parameters: a0 (x location), a1 (y location), a2 (value)
-# returns: nothing
+# returns: none
 #
 grid_set:
 	la	$t0, grid_data
@@ -63,4 +69,28 @@ grid_set:
 
 	sw	$a2, 0($t3)	
 		
+	jr	$ra
+
+#
+# grid_cycle will copy the current data in grid into grid old
+# this must be done for each cycle of the simulation
+# this routine will copy the entirety of the 32x32 grid
+# parameters: none
+# returns: none
+#
+grid_cycle:
+	li	$t0, 0			# x
+	li	$t1, 0			# y
+	la	$t2, grid_data		# used to access the memory addressses
+	la	$t3, grid_data_old	# used to access the memory addresses
+	li	$t4, 32
+outer_cycle:
+	addi	$t1, $t1, 1
+inner_cycle:
+	addi	$t2, $t2, 4
+	addi	$t3, $t3, 4
+	addi	$t0, $t0, 1
+	beq	$t0, $t4, outer_cycle
+	j	inner_cycle	
+finish_cycle:
 	jr	$ra
