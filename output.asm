@@ -49,10 +49,14 @@ burning_text:
 # returns: none
 #
 print_banner:
+	addi	$sp, $sp, -4
+	sw	$ra, 0($sp)
 	li	$v0, PRINT_STRING
 	la	$a0, banner_text
 	syscall
 	jal	print_blank_line
+	lw	$ra, 0($sp)
+	addi	$sp, $sp, 4
 	jr	$ra
 
 #
@@ -88,15 +92,22 @@ print_grid:
 			
 	li	$s4, 0			# x counter
 	li	$s5, 0			# y counter
+	
+	move	$a0, $s2
 	jal	print_board_edge	
 y_loop:
-	jal	print_value	
+	li	$s4, 0			# reset x counter
 	addi	$s5, $s5, 1
 	beq	$s5, $s2, finish
+
+	li	$v0, PRINT_STRING
+	la	$a0, bar_text
+	syscall
 x_loop:
 	move	$a0, $s4
 	move	$a1, $s5
 	jal	print_value	
+
 	addi	$s4, $s4, 1
 	beq	$s4, $s2, y_loop_next
 	j	x_loop
@@ -104,14 +115,17 @@ y_loop_next:
 	li	$v0, PRINT_STRING
 	la	$a0, bar_text
 	syscall
+
 	li	$v0, PRINT_STRING
 	la	$a0, blank_line_text
 	syscall
 	j	y_loop
 finish:
 					# print blank line and finish
+	move	$a0, $s2
 	jal	print_board_edge
 	jal	print_blank_line
+	
 	lw	$s0, 0($sp)
 	lw	$s1, 4($sp)
 	lw	$s2, 8($sp)
@@ -128,7 +142,12 @@ finish:
 # returns: none
 #
 print_board_edge:
-	move	$t0, $a0
+	addi	$sp, $sp, -12
+	sw	$ra, 8($sp)
+	sw	$a0, 4($sp)
+	sw	$s0, 0($sp)
+
+	move	$s0, $a0
 	li	$v0, PRINT_STRING
 	la	$a0, plus_text
 	syscall
@@ -136,14 +155,19 @@ edge_loop:
 	li	$v0, PRINT_STRING
 	la	$a0, minus_text
 	syscall
-	beq	$t0, $zero, finish_edge
-	addi	$t0, $t0, -1
+	addi	$s0, $s0, -1
+	beq	$s0, $zero, finish_edge
 	j	edge_loop
 finish_edge:
 	li	$v0, PRINT_STRING
 	la	$a0, plus_text
 	syscall
 	jal	print_blank_line
+
+	lw	$s0, 0($sp)
+	lw	$a0, 4($sp)
+	lw	$ra, 8($sp)
+	addi	$sp, $sp, 12
 	jr	$ra
 
 #
@@ -152,6 +176,9 @@ finish_edge:
 # returns: none
 #
 print_value:
+	addi	$sp, $sp, -4
+	sw	$ra, 0($sp)
+	
 	jal	grid_get
 	move	$t0, $v0
 	li	$t1, 1
@@ -174,13 +201,22 @@ print_burning:
 print_value_final:
 	li	$v0, PRINT_STRING
 	syscall
+
+	lw	$ra, 0($sp)
+	addi	$sp, $sp, 4	
 	jr	$ra
 	
 #
 # prints a blank line
 #
 print_blank_line:
+	addi	$sp, $sp, -4
+	sw	$ra, 0($sp)
+
 	li	$v0, PRINT_STRING
 	la	$a0, blank_line_text
 	syscall
+
+	lw	$ra, 0($sp)
+	addi	$sp, $sp, 4
 	jr	$ra

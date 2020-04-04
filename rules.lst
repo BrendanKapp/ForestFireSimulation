@@ -1,0 +1,116 @@
+   1 0000               #
+   2 0000               # @author Brendan Kapp
+   3 0000               # this routine will perform the basic rules of the simulation
+   4 0000               #
+   5 0000               
+   6 0000               	.text
+   7 0000               	.align	2
+   8 0000               	.globl	setup_rules
+   9 0000               	.globl	rule_1
+  10 0000               	.globl	rule_2
+  11 0000               	.globl	rule_3
+  12 0000               grid_location:
+  13 0000 00000000		.word	0, 0		# grid, old grid
+     0004 00000000
+  14 0008               
+  15 0008               #
+  16 0008               # setup_rules sets up the grid addresses for the rules to use
+  17 0008               # parameters: a0 (grid), a1 (old grid)
+  18 0008               # returns: none
+  19 0008               #
+  20 0008               setup_rules:
+  21 0008 3C080000		la	$t0, grid_location
+     000c 35080000
+  22 0010 AD040000		sw	$a0, 0($t0)
+  23 0014 AD250004		sw	$a1, 4($t1)
+  24 0018 03E00008		jr	$ra
+  25 001c               get_grid:
+  26 001c 3C080000		la	$t0, grid_location
+     0020 35080000
+  27 0024 8D020000		lw	$v0, 0($t0)
+  28 0028 03E00008		jr	$ra
+  29 002c               get_old_grid:
+  30 002c 3C080000		la	$t0, grid_location
+     0030 35080000
+  31 0034 8D020004		lw	$v0, 4($t0)
+  32 0038 03E00008		jr	$ra
+  33 003c               #
+  34 003c               # rule_1 applies the first rule to the grid location (x, y)
+  35 003c               # a burning cell from the previous generation turns into an empty grass
+  36 003c               # cell in the current generation
+  37 003c               # parameters: a0 (x), a1 (y)
+  38 003c               # returns: none
+  39 003c               #
+  40 003c               rule_1:
+  41 003c 23BDFFEC		addi	$sp, $sp, -20
+  42 0040 AFBF0010		sw	$ra, 16($sp)
+  43 0044 AFB3000C		sw	$s3, 12($sp)
+  44 0048 AFB20008		sw	$s2, 8($sp)
+  45 004c AFB10004		sw	$s1, 4($sp)
+  46 0050 AFB00000		sw	$s0, 0($sp)
+  47 0054               	
+  48 0054 8FB00000		lw	$s0, 0($sp)
+  49 0058 8FB10004		lw	$s1, 4($sp)
+  50 005c 8FB20008		lw	$s2, 8($sp)
+  51 0060 8FB3000C		lw	$s3, 12($sp)
+  52 0064 8FBF0010		lw	$ra, 16($sp)
+  53 0068 23BD0014		addi	$sp, $sp, 20	
+  54 006c 03E00008		jr	$ra
+  55 0070               
+  56 0070               #
+  57 0070               # rule_2 applies the second rule to the grid location (x, y)
+  58 0070               # a tree in the previous generation will burn if at least one
+  59 0070               # of its cardinal direction neighbors in the previous generation
+  60 0070               # is burning, otherwise it will stay a tree
+  61 0070               # paramters: a0 (x), a1 (y)
+  62 0070               # returns: none
+  63 0070               # 
+  64 0070               rule_2:
+  65 0070 23BDFFEC		addi	$sp, $sp, -20
+  66 0074 AFBF0010		sw	$ra, 16($sp)
+  67 0078 AFB3000C		sw	$s3, 12($sp)
+  68 007c AFB20008		sw	$s2, 8($sp)
+  69 0080 AFB10004		sw	$s1, 4($sp)
+  70 0084 AFB00000		sw	$s0, 0($sp)
+  71 0088               
+  72 0088 8FB00000		lw	$s0, 0($sp)
+  73 008c 8FB10004		lw	$s1, 4($sp)
+  74 0090 8FB20008		lw	$s2, 8($sp)
+  75 0094 8FB3000C		lw	$s3, 12($sp)
+  76 0098 8FBF0010		lw	$ra, 16($sp)
+  77 009c 23BD0014		addi	$sp, $sp, 20	
+  78 00a0 03E00008		jr	$ra
+  79 00a4               
+  80 00a4               #
+  81 00a4               # rule_3 applies the third rule to the grid location (x, y)
+  82 00a4               # a previous generation tree will turn an adjacent empty
+  83 00a4               # grass cell into a current generation tree if that
+  84 00a4               # empty cell is in the given wind direction
+  85 00a4               # parameters: a0 (x), a1 (y), a2 (wind direction)
+  86 00a4               # returns: none
+  87 00a4               #
+  88 00a4               rule_3:
+  89 00a4 23BDFFEC		addi	$sp, $sp, -20
+  90 00a8 AFBF0010		sw	$ra, 16($sp)
+  91 00ac AFB3000C		sw	$s3, 12($sp)
+  92 00b0 AFB20008		sw	$s2, 8($sp)
+  93 00b4 AFB10004		sw	$s1, 4($sp)
+  94 00b8 AFB00000		sw	$s0, 0($sp)
+  95 00bc               
+  96 00bc 8FB00000		lw	$s0, 0($sp)
+  97 00c0 8FB10004		lw	$s1, 4($sp)
+  98 00c4 8FB20008		lw	$s2, 8($sp)
+  99 00c8 8FB3000C		lw	$s3, 12($sp)
+ 100 00cc 8FBF0010		lw	$ra, 16($sp)
+ 101 00d0 23BD0014		addi	$sp, $sp, 20	
+ 102 00d4 03E00008		jr	$ra
+ 103 00d8               
+
+
+get_grid         0000001C R  text 
+get_old_grid     0000002C R  text 
+grid_location    00000000 R  text 
+rule_1           0000003C RG text 
+rule_2           00000070 RG text 
+rule_3           000000A4 RG text 
+setup_rules      00000008 RG text 

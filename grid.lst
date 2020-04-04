@@ -65,7 +65,7 @@
   51 0020 01245020		add	$t2, $t1, $a0			# t2 is the offset
   52 0024 01485820		add	$t3, $t2, $t0			# t3 is the address 
   53 0028               
-  54 0028 8D620000		lw	$v0, 0($t3)
+  54 0028 81620000		lb	$v0, 0($t3)
   55 002c               	
   56 002c 03E00008		jr	$ra
   57 0030               #
@@ -84,7 +84,7 @@
   67 0044 01245020		add	$t2, $t1, $a0			# t2 is the offset
   68 0048 01485820		add	$t3, $t2, $t0			# t3 is the address 
   69 004c               
-  70 004c AD660000		sw	$a2, 0($t3)	
+  70 004c A1660000		sb	$a2, 0($t3)	
   71 0050               		
   72 0050 03E00008		jr	$ra
   73 0054               
@@ -96,31 +96,41 @@
   79 0054               # returns: none
   80 0054               #
   81 0054               grid_cycle:
-  82 0054 34080000		li	$t0, 0			# x
-  83 0058 34090000		li	$t1, 0			# y
-  84 005c 3C0A0000		la	$t2, grid_data		# used to access the memory addressses
-     0060 354A0000
-  85 0064 3C0B0000		la	$t3, grid_data_old	# used to access the memory addresses
-     0068 356B0000
-  86 006c 340C0020		li	$t4, 32
-  87 0070               outer_cycle:
-  88 0070 21290001		addi	$t1, $t1, 1
-  89 0074               inner_cycle:
-  90 0074 214A0004		addi	$t2, $t2, 4
-  91 0078 216B0004		addi	$t3, $t3, 4
-  92 007c 21080001		addi	$t0, $t0, 1
-  93 0080 110CFFFB		beq	$t0, $t4, outer_cycle
-  94 0084 0800001D		j	inner_cycle	
-  95 0088               finish_cycle:
-  96 0088 03E00008		jr	$ra
+  82 0054 23BDFFFC		addi	$sp, $sp, -4
+  83 0058 AFBF0000		sw	$ra, 0($sp)
+  84 005c               	
+  85 005c 34080000		li	$t0, 0			# x counter
+  86 0060 34090000		li	$t1, 0			# y counter
+  87 0064 3C0A0000		la	$t2, grid_data		# used to access the memory addressses
+     0068 354A0000
+  88 006c 3C0B0000		la	$t3, grid_data_old	# used to access the memory addresses
+     0070 356B0000
+  89 0074 340C0020		li	$t4, 32
+  90 0078               outer_cycle:
+  91 0078 34080000		li	$t0, 0			# reset x counter
+  92 007c 21290001		addi	$t1, $t1, 1
+  93 0080 112C0007		beq	$t1, $t4, finish_cycle
+  94 0084               inner_cycle:
+  95 0084 814D0000		lb	$t5, 0($t2)		# load byte from old
+  96 0088 A16D0000		sb	$t5, 0($t3)		# save byte into new
+  97 008c 214A0001		addi	$t2, $t2, 1		# memory address + 1
+  98 0090 216B0001		addi	$t3, $t3, 1		# memory address + 1
+  99 0094 21080001		addi	$t0, $t0, 1
+ 100 0098 110CFFF7		beq	$t0, $t4, outer_cycle
+ 101 009c 08000021		j	inner_cycle	
+ 102 00a0               finish_cycle:
+ 103 00a0               
+ 104 00a0 8FBF0000		lw	$ra, 0($sp)
+ 105 00a4 23BD0004		addi	$sp, $sp, 4
+ 106 00a8 03E00008		jr	$ra
 
 
-finish_cycle     00000088 R  text 
+finish_cycle     000000A0 R  text 
 grid_create      00000000 RG text 
 grid_cycle       00000054 RG text 
 grid_data        00000000 R  data 
 grid_data_old    00001000 R  data 
 grid_get         0000000C RG text 
 grid_set         00000030 RG text 
-inner_cycle      00000074 R  text 
-outer_cycle      00000070 R  text 
+inner_cycle      00000084 R  text 
+outer_cycle      00000078 R  text 

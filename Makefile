@@ -28,7 +28,7 @@ RLINK = /home/fac/wrc/bin/rlink
 #
 # Object files
 #
-OBJECTS = forest_fire.obj input.obj output.obj grid.obj
+OBJECTS = forest_fire.obj input.obj output.obj grid.obj rules.obj
 
 #
 # Main target

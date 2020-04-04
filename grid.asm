@@ -51,7 +51,7 @@ grid_get:
 	add	$t2, $t1, $a0			# t2 is the offset
 	add	$t3, $t2, $t0			# t3 is the address 
 
-	lw	$v0, 0($t3)
+	lb	$v0, 0($t3)
 	
 	jr	$ra
 #
@@ -67,7 +67,7 @@ grid_set:
 	add	$t2, $t1, $a0			# t2 is the offset
 	add	$t3, $t2, $t0			# t3 is the address 
 
-	sw	$a2, 0($t3)	
+	sb	$a2, 0($t3)	
 		
 	jr	$ra
 
@@ -79,18 +79,28 @@ grid_set:
 # returns: none
 #
 grid_cycle:
-	li	$t0, 0			# x
-	li	$t1, 0			# y
+	addi	$sp, $sp, -4
+	sw	$ra, 0($sp)
+	
+	li	$t0, 0			# x counter
+	li	$t1, 0			# y counter
 	la	$t2, grid_data		# used to access the memory addressses
 	la	$t3, grid_data_old	# used to access the memory addresses
 	li	$t4, 32
 outer_cycle:
+	li	$t0, 0			# reset x counter
 	addi	$t1, $t1, 1
+	beq	$t1, $t4, finish_cycle
 inner_cycle:
-	addi	$t2, $t2, 4
-	addi	$t3, $t3, 4
+	lb	$t5, 0($t2)		# load byte from old
+	sb	$t5, 0($t3)		# save byte into new
+	addi	$t2, $t2, 1		# memory address + 1
+	addi	$t3, $t3, 1		# memory address + 1
 	addi	$t0, $t0, 1
 	beq	$t0, $t4, outer_cycle
 	j	inner_cycle	
 finish_cycle:
+
+	lw	$ra, 0($sp)
+	addi	$sp, $sp, 4
 	jr	$ra
