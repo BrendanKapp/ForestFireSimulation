@@ -22,6 +22,14 @@ input_failed_text:
 	.asciiz	"Input failed\n"
 input_success_text:
 	.asciiz "Input passed\n"
+invalid_grid_size:
+	.asciiz "ERROR: invalid grid size\n"
+invalid_num_gen:
+	.asciiz "ERROR: invalid number of generations\n"
+invalid_wind_dir:
+	.asciiz "ERROR: invalid wind direction\n"
+invalid_char_grid:
+	.asciiz "ERROR: invalid character in grid\n"
 newline:
 	.asciiz "\n"
 
@@ -38,6 +46,9 @@ newline:
 	.globl	grid_cycle
 	.globl	print_banner
 	.globl	print_grid
+	.globl	rule_1
+	.globl	rule_2
+	.globl	rule_3
 
 main:
 	addi	$sp, $sp, -32
@@ -56,30 +67,55 @@ main:
 						#  is -1 (fail) or success 		
 input_failed:
 	li	$v0, PRINT_STRING
-	la	$a0, input_failed_text
+	li	$t1, 1
+	beq	$v1, $t1, error_size
+	li	$t1, 2
+	beq	$v1, $t1, error_gen
+	li	$t1, 3
+	beq	$v1, $t1, error_wind
+	li	$t1, 4
+	beq	$v1, $t1, error_char
+error_size:
+	la	$a0, invalid_grid_size
+	j	error_end
+error_gen:
+	la	$a0, invalid_num_gen
+	j	error_end
+error_wind:
+	la	$a0, invalid_wind_dir
+	j	error_end	
+error_char:
+	la	$a0, invalid_char_grid
+	j	error_end
+error_end:
 	syscall
 
-	li	$v0, PRINT_INT
-	move	$a0, $v1
-	syscall
+
+	#li	$v0, PRINT_STRING
+	#la	$a0, input_failed_text
+	#syscall
+
+	#li	$v0, PRINT_INT
+	#move	$a0, $v1
+	#syscall
 	
-	li	$v0, PRINT_STRING
-	la	$a0, newline
-	syscall
+	#li	$v0, PRINT_STRING
+	#la	$a0, newline
+	#syscall
 	j	main_done
 input_success:
 	move	$t1, $v0			# print success message
-	li	$v0, PRINT_STRING
-	la	$a0, input_success_text
-	syscall
+	#li	$v0, PRINT_STRING
+	#la	$a0, input_success_text
+	#syscall
 
-	li	$v0, PRINT_INT			# print address
-	move	$a0, $t1
-	syscall
+	#li	$v0, PRINT_INT			# print address
+	#move	$a0, $t1
+	#syscall
 	
-	li	$v0, PRINT_STRING
-	la	$a0, newline
-	syscall
+	#li	$v0, PRINT_STRING
+	#la	$a0, newline
+	#syscall
 main_loop_start:
 	jal	grid_create			# create the grid
 	move	$s7, $v0			# grid address
@@ -96,9 +132,35 @@ main_loop:
 	jal	print_grid
 	# increment
 	addi	$s0, $s0, 1
+	# loop over all grid spaces
+	li	$s4, 0				# x counter
+	li	$s5, -1				# y counter
+grid_loop_outer:
+	addi	$s5, $s5, 1
+	li	$s4, 0				# reset x counter
+	beq	$s5, $s1, grid_loop_end
+grid_loop_inner:
+	
 	# apple rule 1
+	move	$a0, $s4
+	move	$a1, $s5
+	jal	rule_1
 	# apply rule 2
+	move	$a0, $s4
+	move	$a1, $s5
+	move	$a2, $s1
+	jal	rule_2
 	# apply rule 3
+	move	$a0, $s4
+	move	$a1, $s5
+	move	$a2, $s1
+	move	$a3, $s3
+	jal	rule_3
+
+	addi	$s4, $s4, 1
+	beq	$s4, $s1, grid_loop_outer
+	j	grid_loop_inner
+grid_loop_end:
 	# copy generation
 	jal	grid_cycle	
 	# loop

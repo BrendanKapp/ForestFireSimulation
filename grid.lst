@@ -35,102 +35,125 @@
   25 0000               	.align	2
   26 0000               	.globl	grid_create
   27 0000               	.globl	grid_get
-  28 0000               	.globl	grid_set
-  29 0000               	.globl	grid_cycle
-  30 0000               #
-  31 0000               # assigns 0's to the entire grid of memory to be used
-  32 0000               # grid builds from the top left outwards but always uses a 32x32 grid
-  33 0000               # this enables the movement vertically to be done by +/- 32
-  34 0000               # to move horizontally +/- 1
-  35 0000               # parameters: a0 (x size), a1 (y size)
-  36 0000               # returns: grid address
-  37 0000               #
-  38 0000               grid_create:
-  39 0000 3C020000		la	$v0, grid_data
+  28 0000               	.globl	grid_get_old
+  29 0000               	.globl	grid_set
+  30 0000               	.globl	grid_cycle
+  31 0000               #
+  32 0000               # assigns 0's to the entire grid of memory to be used
+  33 0000               # grid builds from the top left outwards but always uses a 32x32 grid
+  34 0000               # this enables the movement vertically to be done by +/- 32
+  35 0000               # to move horizontally +/- 1
+  36 0000               # parameters: a0 (x size), a1 (y size)
+  37 0000               # returns: grid address
+  38 0000               #
+  39 0000               grid_create:
+  40 0000 3C020000		la	$v0, grid_data
      0004 34420000
-  40 0008 03E00008		jr	$ra
-  41 000c               #
-  42 000c               # grid_get will return the value at (a0, a1)
-  43 000c               # parameters: a0 (x location), a1 (y location)
-  44 000c               # returns: v0 (returns value, 0 for fail)
-  45 000c               #
-  46 000c               grid_get:
-  47 000c 3C080000		la	$t0, grid_data
+  41 0008 03E00008		jr	$ra
+  42 000c               #
+  43 000c               # grid_get_old will return the value at (a0, a1) from the old grid
+  44 000c               # parameters: a0 (x location), a1 (y location)
+  45 000c               # returns: v0 (returns value, 0 for fail)
+  46 000c               #
+  47 000c               grid_get_old:
+  48 000c 3C080000		la	$t0, grid_data_old
      0010 35080000
-  48 0014               						# to retrieve a value:
-  49 0014               						#  mem = 32 * y + x
-  50 0014 34010020		mul	$t1, $a1, 32
+  49 0014               						# to retrieve a value:
+  50 0014               						#  mem = 32 * y + x
+  51 0014 34010020		mul	$t1, $a1, 32
      0018 00A10018
      001c 00004812
-  51 0020 01245020		add	$t2, $t1, $a0			# t2 is the offset
-  52 0024 01485820		add	$t3, $t2, $t0			# t3 is the address 
-  53 0028               
-  54 0028 81620000		lb	$v0, 0($t3)
-  55 002c               	
-  56 002c 03E00008		jr	$ra
-  57 0030               #
-  58 0030               # grid_set will set the value at (a0, a1)
-  59 0030               # parameters: a0 (x location), a1 (y location), a2 (value)
-  60 0030               # returns: none
-  61 0030               #
-  62 0030               grid_set:
-  63 0030 3C080000		la	$t0, grid_data
+  52 0020 01245020		add	$t2, $t1, $a0			# t2 is the offset
+  53 0024 01485820		add	$t3, $t2, $t0			# t3 is the address 
+  54 0028               
+  55 0028 81620000		lb	$v0, 0($t3)
+  56 002c               	
+  57 002c 03E00008		jr	$ra
+  58 0030               #
+  59 0030               
+  60 0030               #
+  61 0030               # grid_get will return the value at (a0, a1)
+  62 0030               # parameters: a0 (x location), a1 (y location)
+  63 0030               # returns: v0 (returns value, 0 for fail)
+  64 0030               #
+  65 0030               grid_get:
+  66 0030 3C080000		la	$t0, grid_data
      0034 35080000
-  64 0038               						# to retrieve a value:
-  65 0038               						#  mem = 32 * y + x
-  66 0038 34010020		mul	$t1, $a1, 32
+  67 0038               						# to retrieve a value:
+  68 0038               						#  mem = 32 * y + x
+  69 0038 34010020		mul	$t1, $a1, 32
      003c 00A10018
      0040 00004812
-  67 0044 01245020		add	$t2, $t1, $a0			# t2 is the offset
-  68 0048 01485820		add	$t3, $t2, $t0			# t3 is the address 
-  69 004c               
-  70 004c A1660000		sb	$a2, 0($t3)	
-  71 0050               		
-  72 0050 03E00008		jr	$ra
-  73 0054               
-  74 0054               #
-  75 0054               # grid_cycle will copy the current data in grid into grid old
-  76 0054               # this must be done for each cycle of the simulation
-  77 0054               # this routine will copy the entirety of the 32x32 grid
-  78 0054               # parameters: none
+  70 0044 01245020		add	$t2, $t1, $a0			# t2 is the offset
+  71 0048 01485820		add	$t3, $t2, $t0			# t3 is the address 
+  72 004c               
+  73 004c 81620000		lb	$v0, 0($t3)
+  74 0050               	
+  75 0050 03E00008		jr	$ra
+  76 0054               #
+  77 0054               # grid_set will set the value at (a0, a1)
+  78 0054               # parameters: a0 (x location), a1 (y location), a2 (value)
   79 0054               # returns: none
   80 0054               #
-  81 0054               grid_cycle:
-  82 0054 23BDFFFC		addi	$sp, $sp, -4
-  83 0058 AFBF0000		sw	$ra, 0($sp)
-  84 005c               	
-  85 005c 34080000		li	$t0, 0			# x counter
-  86 0060 34090000		li	$t1, 0			# y counter
-  87 0064 3C0A0000		la	$t2, grid_data		# used to access the memory addressses
-     0068 354A0000
-  88 006c 3C0B0000		la	$t3, grid_data_old	# used to access the memory addresses
-     0070 356B0000
-  89 0074 340C0020		li	$t4, 32
-  90 0078               outer_cycle:
-  91 0078 34080000		li	$t0, 0			# reset x counter
-  92 007c 21290001		addi	$t1, $t1, 1
-  93 0080 112C0007		beq	$t1, $t4, finish_cycle
-  94 0084               inner_cycle:
-  95 0084 814D0000		lb	$t5, 0($t2)		# load byte from old
-  96 0088 A16D0000		sb	$t5, 0($t3)		# save byte into new
-  97 008c 214A0001		addi	$t2, $t2, 1		# memory address + 1
-  98 0090 216B0001		addi	$t3, $t3, 1		# memory address + 1
-  99 0094 21080001		addi	$t0, $t0, 1
- 100 0098 110CFFF7		beq	$t0, $t4, outer_cycle
- 101 009c 08000021		j	inner_cycle	
- 102 00a0               finish_cycle:
- 103 00a0               
- 104 00a0 8FBF0000		lw	$ra, 0($sp)
- 105 00a4 23BD0004		addi	$sp, $sp, 4
- 106 00a8 03E00008		jr	$ra
+  81 0054               grid_set:
+  82 0054 3C080000		la	$t0, grid_data
+     0058 35080000
+  83 005c               						# to retrieve a value:
+  84 005c               						#  mem = 32 * y + x
+  85 005c 34010020		mul	$t1, $a1, 32
+     0060 00A10018
+     0064 00004812
+  86 0068 01245020		add	$t2, $t1, $a0			# t2 is the offset
+  87 006c 01485820		add	$t3, $t2, $t0			# t3 is the address 
+  88 0070               
+  89 0070 A1660000		sb	$a2, 0($t3)	
+  90 0074               		
+  91 0074 03E00008		jr	$ra
+  92 0078               
+  93 0078               #
+  94 0078               # grid_cycle will copy the current data in grid into grid old
+  95 0078               # this must be done for each cycle of the simulation
+  96 0078               # this routine will copy the entirety of the 32x32 grid
+  97 0078               # parameters: none
+  98 0078               # returns: none
+  99 0078               #
+ 100 0078               grid_cycle:
+ 101 0078 23BDFFFC		addi	$sp, $sp, -4
+ 102 007c AFBF0000		sw	$ra, 0($sp)
+ 103 0080               	
+ 104 0080 34080000		li	$t0, 0			# x counter
+ 105 0084 34090000		li	$t1, 0			# y counter
+ 106 0088 3C0A0000		la	$t2, grid_data		# used to access the memory addressses
+     008c 354A0000
+ 107 0090 3C0B0000		la	$t3, grid_data_old	# used to access the memory addresses
+     0094 356B0000
+ 108 0098 340C0020		li	$t4, 32
+ 109 009c               outer_cycle:
+ 110 009c 34080000		li	$t0, 0			# reset x counter
+ 111 00a0 21290001		addi	$t1, $t1, 1
+ 112 00a4 112C0007		beq	$t1, $t4, finish_cycle
+ 113 00a8               inner_cycle:
+ 114 00a8 814D0000		lb	$t5, 0($t2)		# load byte from old
+ 115 00ac A16D0000		sb	$t5, 0($t3)		# save byte into new
+ 116 00b0 214A0001		addi	$t2, $t2, 1		# memory address + 1
+ 117 00b4 216B0001		addi	$t3, $t3, 1		# memory address + 1
+ 118 00b8 21080001		addi	$t0, $t0, 1
+ 119 00bc 110CFFF7		beq	$t0, $t4, outer_cycle
+ 120 00c0 0800002A		j	inner_cycle	
+ 121 00c4               finish_cycle:
+ 122 00c4               
+ 123 00c4 8FBF0000		lw	$ra, 0($sp)
+ 124 00c8 23BD0004		addi	$sp, $sp, 4
+ 125 00cc 03E00008		jr	$ra
 
 
-finish_cycle     000000A0 R  text 
+finish_cycle     000000C4 R  text 
 grid_create      00000000 RG text 
-grid_cycle       00000054 RG text 
+grid_cycle       00000078 RG text 
 grid_data        00000000 R  data 
 grid_data_old    00001000 R  data 
-grid_get         0000000C RG text 
-grid_set         00000030 RG text 
-inner_cycle      00000084 R  text 
-outer_cycle      00000078 R  text 
+grid_get         00000030 RG text 
+grid_get_old     0000000C RG text 
+grid_set         00000054 RG text 
+inner_cycle      000000A8 R  text 
+outer_cycle      0000009C R  text 

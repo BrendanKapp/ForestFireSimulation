@@ -162,7 +162,7 @@
  144 016c 08000045		j	read_grid_loop
  145 0170               verify_fail:
  146 0170 2402FFFF		li	$v0, -1
- 147 0174 02601821		move	$v1, $s3
+ 147 0174 34030004		li	$v1, 4
  148 0178 08000061		j	read_input_finish
  149 017c               read_grid_finish:
  150 017c 3C020000		la	$v0, input_data	

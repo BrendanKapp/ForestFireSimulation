@@ -25,6 +25,7 @@ grid_data_old:
 	.align	2
 	.globl	grid_create
 	.globl	grid_get
+	.globl	grid_get_old
 	.globl	grid_set
 	.globl	grid_cycle
 #
@@ -38,6 +39,24 @@ grid_data_old:
 grid_create:
 	la	$v0, grid_data
 	jr	$ra
+#
+# grid_get_old will return the value at (a0, a1) from the old grid
+# parameters: a0 (x location), a1 (y location)
+# returns: v0 (returns value, 0 for fail)
+#
+grid_get_old:
+	la	$t0, grid_data_old
+						# to retrieve a value:
+						#  mem = 32 * y + x
+	mul	$t1, $a1, 32
+	add	$t2, $t1, $a0			# t2 is the offset
+	add	$t3, $t2, $t0			# t3 is the address 
+
+	lb	$v0, 0($t3)
+	
+	jr	$ra
+#
+
 #
 # grid_get will return the value at (a0, a1)
 # parameters: a0 (x location), a1 (y location)

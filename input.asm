@@ -144,7 +144,7 @@ verify_end:
 	j	read_grid_loop
 verify_fail:
 	li	$v0, -1
-	move	$v1, $s3
+	li	$v1, 4
 	j	read_input_finish
 read_grid_finish:
 	la	$v0, input_data	
