@@ -132,8 +132,6 @@ main_loop:
 	move	$a1, $s0
 	move	$a2, $s1
 	jal	print_grid
-	# increment
-	addi	$s0, $s0, 1
 	# loop over all grid spaces
 	li	$s4, 0				# x counter
 	li	$s5, -1				# y counter
@@ -167,6 +165,8 @@ grid_loop_end:
 	jal	grid_cycle	
 	# loop
 	beq	$s0, $s2, main_done
+	# increment
+	addi	$s0, $s0, 1
 	j	main_loop
 	
 main_done:

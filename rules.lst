@@ -177,15 +177,15 @@
  173 01a0               	# check wind (N, S, E, W)
  174 01a0               	# (78, 83, 69, 87)
  175 01a0 340A004E		li	$t2, 78				# North
- 176 01a4 126A0007		beq	$s3, $t2, tree_above
+ 176 01a4 126A0024		beq	$s3, $t2, tree_before
  177 01a8 340A0053		li	$t2, 83
- 178 01ac 126A000E		beq	$s3, $t2, tree_below		# South
+ 178 01ac 126A0018		beq	$s3, $t2, tree_after		# South
  179 01b0 340A0045		li	$t2, 69
- 180 01b4 126A0016		beq	$s3, $t2, tree_after		# East
+ 180 01b4 126A000C		beq	$s3, $t2, tree_below		# East
  181 01b8 340A0057		li	$t2, 87
- 182 01bc 126A001E		beq	$s3, $t2, tree_before		# West
+ 182 01bc 126A0001		beq	$s3, $t2, tree_above		# West
  183 01c0 08000099		j	rule_3_end			# Error	
- 184 01c4               tree_above:
+ 184 01c4               tree_above:	# west
  185 01c4               	# check above
  186 01c4 2088FFFF		addi	$t0, $a0, -1
  187 01c8 0100482A		slt	$t1, $t0, $zero			# 1 = val is neg, we skip
@@ -198,7 +198,7 @@
  194 01e0 1049001E		beq	$v0, $t1, rule_3_tree
  195 01e4 08000099		j	rule_3_end
  196 01e8               	# check below
- 197 01e8               tree_below:
+ 197 01e8               tree_below:	# east
  198 01e8 224AFFFF		addi	$t2, $s2, -1			# grid boundary
  199 01ec 22080001		addi	$t0, $s0, 1
  200 01f0 0148482A		slt	$t1, $t2, $t0			# 1 = val is to large, skip
@@ -211,7 +211,7 @@
  207 0208 10490014		beq	$v0, $t1, rule_3_tree
  208 020c 08000099		j	rule_3_end
  209 0210               	# check after
- 210 0210               tree_after:
+ 210 0210               tree_after:	# north
  211 0210 224AFFFF		addi	$t2, $s2, -1			# grid boundary
  212 0214 22290001		addi	$t1, $s1, 1
  213 0218 0149402A		slt	$t0, $t2, $t1			# 1 = val is to large, skip
@@ -224,7 +224,7 @@
  220 0230 1049000A		beq	$v0, $t1, rule_3_tree
  221 0234 08000099		j	rule_3_end
  222 0238               	# check before
- 223 0238               tree_before:
+ 223 0238               tree_before:	# south
  224 0238 2229FFFF		addi	$t1, $s1, -1
  225 023c 0220402A		slt	$t0, $s1, $zero			# 1 = val is neg, we skip
  226 0240 15000008		bne	$t0, $zero, rule_3_end

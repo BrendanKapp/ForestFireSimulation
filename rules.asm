@@ -173,15 +173,15 @@ rule_3:
 	# check wind (N, S, E, W)
 	# (78, 83, 69, 87)
 	li	$t2, 78				# North
-	beq	$s3, $t2, tree_above
+	beq	$s3, $t2, tree_before
 	li	$t2, 83
-	beq	$s3, $t2, tree_below		# South
+	beq	$s3, $t2, tree_after		# South
 	li	$t2, 69
-	beq	$s3, $t2, tree_after		# East
+	beq	$s3, $t2, tree_below		# East
 	li	$t2, 87
-	beq	$s3, $t2, tree_before		# West
+	beq	$s3, $t2, tree_above		# West
 	j	rule_3_end			# Error	
-tree_above:
+tree_above:	# west
 	# check above
 	addi	$t0, $a0, -1
 	slt	$t1, $t0, $zero			# 1 = val is neg, we skip
@@ -194,7 +194,7 @@ tree_above:
 	beq	$v0, $t1, rule_3_tree
 	j	rule_3_end
 	# check below
-tree_below:
+tree_below:	# east
 	addi	$t2, $s2, -1			# grid boundary
 	addi	$t0, $s0, 1
 	slt	$t1, $t2, $t0			# 1 = val is to large, skip
@@ -207,7 +207,7 @@ tree_below:
 	beq	$v0, $t1, rule_3_tree
 	j	rule_3_end
 	# check after
-tree_after:
+tree_after:	# north
 	addi	$t2, $s2, -1			# grid boundary
 	addi	$t1, $s1, 1
 	slt	$t0, $t2, $t1			# 1 = val is to large, skip
@@ -220,7 +220,7 @@ tree_after:
 	beq	$v0, $t1, rule_3_tree
 	j	rule_3_end
 	# check before
-tree_before:
+tree_before:	# south
 	addi	$t1, $s1, -1
 	slt	$t0, $s1, $zero			# 1 = val is neg, we skip
 	bne	$t0, $zero, rule_3_end

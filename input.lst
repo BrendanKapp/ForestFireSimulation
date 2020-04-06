@@ -89,123 +89,122 @@
   74 0090 340B001E		li	$t3, 30
   75 0094 8D2C0000		lw	$t4, 0($t1)
   76 0098 018A682A		slt	$t5, $t4, $t2
-  77 009c 15A00018		bne	$t5, $zero, read_input_fail
+  77 009c 15A00017		bne	$t5, $zero, read_input_fail
   78 00a0 016C682A		slt	$t5, $t3, $t4
-  79 00a4 15A00016		bne	$t5, $zero, read_input_fail
+  79 00a4 15A00015		bne	$t5, $zero, read_input_fail
   80 00a8               						# check generations (0 <= 20)
   81 00a8 34030002		li	$v1, 2				# error code 2
   82 00ac 340A0000		li	$t2, 0
   83 00b0 340B0014		li	$t3, 20
   84 00b4 8D2C0004		lw	$t4, 4($t1)
   85 00b8 018A682A		slt	$t5, $t4, $t2
-  86 00bc 15A00010		bne	$t5, $zero, read_input_fail
+  86 00bc 15A0000F		bne	$t5, $zero, read_input_fail
   87 00c0 016C682A		slt	$t5, $t3, $t4
-  88 00c4 15A0000E		bne	$t5, $zero, read_input_fail	
+  88 00c4 15A0000D		bne	$t5, $zero, read_input_fail	
   89 00c8               						# check wind (N, S, E, W)
   90 00c8               						# (78, 83, 69, 87)
   91 00c8 34030003		li	$v1, 3				# error code 3
   92 00cc 340A004E		li	$t2, 78
   93 00d0 8D2C0010		lw	$t4, 16($t1)
   94 00d4 AD2C0008		sw	$t4, 8($t1)			# reposition the wind
-  95 00d8 01801821		move	$v1, $t4
-  96 00dc 118A0007		beq	$t4, $t2, read_input_pass
-  97 00e0 340A0053		li	$t2, 83
-  98 00e4 118A0005		beq	$t4, $t2, read_input_pass
-  99 00e8 340A0045		li	$t2, 69
- 100 00ec 118A0003		beq	$t4, $t2, read_input_pass
- 101 00f0 340A0057		li	$t2, 87
- 102 00f4 118A0001		beq	$t4, $t2, read_input_pass
- 103 00f8 08000040		j	read_input_fail
- 104 00fc               read_input_pass:
- 105 00fc               	#la	$v0, input_data			# return the data address
- 106 00fc 08000042		j	read_grid_start
- 107 0100               read_input_fail:
- 108 0100 2402FFFF		la	$v0, -1				# return an error code
- 109 0104 08000062		j	read_input_finish
- 110 0108               read_grid_start:
- 111 0108 3C090000		la	$t1, input_data			# data address
-     010c 35290000
- 112 0110 8D310000		lw	$s1, 0($t1)			# size of grid
- 113 0114 34120000		li	$s2, 0				# counter
- 114 0118               read_grid_loop:
- 115 0118               	# read each line of input
- 116 0118 3C040000		la	$a0, input_grid_data
-     011c 34840000
- 117 0120 34050020		li	$a1, 32	
- 118 0124 34020008		li	$v0, READ_STRING
- 119 0128 0000000C		syscall
- 120 012c               	#la	$a0, input_grid_data
- 121 012c               	#li	$v0, PRINT_STRING
- 122 012c               	#syscall
- 123 012c               	# verify each line (either continue or error)
- 124 012c 3C140000		la	$s4, input_grid_data		# verify address
-     0130 36940000
- 125 0134 34130000		li	$s3, 0				# verify counter
- 126 0138 2415FFFF		li	$s5, -1				# error code
- 127 013c               verify_loop:
- 128 013c 82840000		lb	$a0, 0($s4)
- 129 0140 0C00006D		jal	grid_text_to_int
- 130 0144 1055000B		beq	$v0, $s5, verify_fail
- 131 0148               	# save each piece
- 132 0148 02602021		move	$a0, $s3			# x location
- 133 014c 02402821		move	$a1, $s2			# y location
- 134 0150 00403021		move	$a2, $v0			# value
- 135 0154 0C000000		jal	grid_set
- 136 0158               
- 137 0158 22730001		addi	$s3, $s3, 1
- 138 015c 22940001		addi	$s4, $s4, 1
- 139 0160 12710001		beq	$s3, $s1, verify_end
- 140 0164 0800004F		j	verify_loop
- 141 0168               verify_end:
- 142 0168               	# go to next line		
- 143 0168 22520001		addi	$s2, $s2, 1
- 144 016c 12320004		beq	$s1, $s2, read_grid_finish
- 145 0170 08000046		j	read_grid_loop
- 146 0174               verify_fail:
- 147 0174 2402FFFF		li	$v0, -1
- 148 0178 34030004		li	$v1, 4
- 149 017c 08000062		j	read_input_finish
- 150 0180               read_grid_finish:
- 151 0180 3C020000		la	$v0, input_data	
-     0184 34420000
- 152 0188               read_input_finish:
- 153 0188 8FB00000		lw	$s0, 0($sp)
- 154 018c 8FB10004		lw	$s1, 4($sp)
- 155 0190 8FB20008		lw	$s2, 8($sp)
- 156 0194 8FB3000C		lw	$s3, 12($sp)
- 157 0198 8FB40010		lw	$s4, 16($sp)
- 158 019c 8FB50014		lw	$s5, 20($sp)
- 159 01a0 8FB60018		lw	$s6, 24($sp)
- 160 01a4 8FB7001C		lw	$s7, 28($sp)
- 161 01a8 8FBF0020		lw	$ra, 32($sp)
- 162 01ac 23BD0024		addi	$sp, $sp, 36
- 163 01b0 03E00008		jr	$ra
- 164 01b4               
- 165 01b4               #
- 166 01b4               # takes in the grid input and returns the int to store
- 167 01b4               # parameters: a0 (grid input)
- 168 01b4               # returns: v0 (int to store, -1 for bad value)
- 169 01b4               #
- 170 01b4               grid_text_to_int:
- 171 01b4 23BDFFFC		addi	$sp, $sp, -4
- 172 01b8 AFBF0000		sw	$ra, 0($sp)
- 173 01bc               						# ascii values to check for
- 174 01bc               						# B (66), t (116), . (46)
- 175 01bc 34080042		li	$t0, 66				# check for B
- 176 01c0 34020003		li	$v0, 3				# set to burning
- 177 01c4 10880007		beq	$a0, $t0, grid_text_end
- 178 01c8 34080074		li	$t0, 116			# check for t
- 179 01cc 34020002		li	$v0, 2				# set to tree
- 180 01d0 10880004		beq	$a0, $t0, grid_text_end
- 181 01d4 3408002E		li	$t0, 46				# check for .
- 182 01d8 34020001		li	$v0, 1				# set to grass
- 183 01dc 10880001		beq	$a0, $t0, grid_text_end
- 184 01e0               	
- 185 01e0 2402FFFF		li	$v0, -1				# error
- 186 01e4               grid_text_end:
- 187 01e4 8FBF0000		lw	$ra, 0($sp)
- 188 01e8 23BD0004		addi	$sp, $sp, 4
- 189 01ec 03E00008		jr	$ra
+  95 00d8 118A0007		beq	$t4, $t2, read_input_pass
+  96 00dc 340A0053		li	$t2, 83
+  97 00e0 118A0005		beq	$t4, $t2, read_input_pass
+  98 00e4 340A0045		li	$t2, 69
+  99 00e8 118A0003		beq	$t4, $t2, read_input_pass
+ 100 00ec 340A0057		li	$t2, 87
+ 101 00f0 118A0001		beq	$t4, $t2, read_input_pass
+ 102 00f4 0800003F		j	read_input_fail
+ 103 00f8               read_input_pass:
+ 104 00f8               	#la	$v0, input_data			# return the data address
+ 105 00f8 08000041		j	read_grid_start
+ 106 00fc               read_input_fail:
+ 107 00fc 2402FFFF		la	$v0, -1				# return an error code
+ 108 0100 08000061		j	read_input_finish
+ 109 0104               read_grid_start:
+ 110 0104 3C090000		la	$t1, input_data			# data address
+     0108 35290000
+ 111 010c 8D310000		lw	$s1, 0($t1)			# size of grid
+ 112 0110 34120000		li	$s2, 0				# counter
+ 113 0114               read_grid_loop:
+ 114 0114               	# read each line of input
+ 115 0114 3C040000		la	$a0, input_grid_data
+     0118 34840000
+ 116 011c 34050020		li	$a1, 32	
+ 117 0120 34020008		li	$v0, READ_STRING
+ 118 0124 0000000C		syscall
+ 119 0128               	#la	$a0, input_grid_data
+ 120 0128               	#li	$v0, PRINT_STRING
+ 121 0128               	#syscall
+ 122 0128               	# verify each line (either continue or error)
+ 123 0128 3C140000		la	$s4, input_grid_data		# verify address
+     012c 36940000
+ 124 0130 34130000		li	$s3, 0				# verify counter
+ 125 0134 2415FFFF		li	$s5, -1				# error code
+ 126 0138               verify_loop:
+ 127 0138 82840000		lb	$a0, 0($s4)
+ 128 013c 0C00006C		jal	grid_text_to_int
+ 129 0140 1055000B		beq	$v0, $s5, verify_fail
+ 130 0144               	# save each piece
+ 131 0144 02602021		move	$a0, $s3			# x location
+ 132 0148 02402821		move	$a1, $s2			# y location
+ 133 014c 00403021		move	$a2, $v0			# value
+ 134 0150 0C000000		jal	grid_set
+ 135 0154               
+ 136 0154 22730001		addi	$s3, $s3, 1
+ 137 0158 22940001		addi	$s4, $s4, 1
+ 138 015c 12710001		beq	$s3, $s1, verify_end
+ 139 0160 0800004E		j	verify_loop
+ 140 0164               verify_end:
+ 141 0164               	# go to next line		
+ 142 0164 22520001		addi	$s2, $s2, 1
+ 143 0168 12320004		beq	$s1, $s2, read_grid_finish
+ 144 016c 08000045		j	read_grid_loop
+ 145 0170               verify_fail:
+ 146 0170 2402FFFF		li	$v0, -1
+ 147 0174 34030004		li	$v1, 4
+ 148 0178 08000061		j	read_input_finish
+ 149 017c               read_grid_finish:
+ 150 017c 3C020000		la	$v0, input_data	
+     0180 34420000
+ 151 0184               read_input_finish:
+ 152 0184 8FB00000		lw	$s0, 0($sp)
+ 153 0188 8FB10004		lw	$s1, 4($sp)
+ 154 018c 8FB20008		lw	$s2, 8($sp)
+ 155 0190 8FB3000C		lw	$s3, 12($sp)
+ 156 0194 8FB40010		lw	$s4, 16($sp)
+ 157 0198 8FB50014		lw	$s5, 20($sp)
+ 158 019c 8FB60018		lw	$s6, 24($sp)
+ 159 01a0 8FB7001C		lw	$s7, 28($sp)
+ 160 01a4 8FBF0020		lw	$ra, 32($sp)
+ 161 01a8 23BD0024		addi	$sp, $sp, 36
+ 162 01ac 03E00008		jr	$ra
+ 163 01b0               
+ 164 01b0               #
+ 165 01b0               # takes in the grid input and returns the int to store
+ 166 01b0               # parameters: a0 (grid input)
+ 167 01b0               # returns: v0 (int to store, -1 for bad value)
+ 168 01b0               #
+ 169 01b0               grid_text_to_int:
+ 170 01b0 23BDFFFC		addi	$sp, $sp, -4
+ 171 01b4 AFBF0000		sw	$ra, 0($sp)
+ 172 01b8               						# ascii values to check for
+ 173 01b8               						# B (66), t (116), . (46)
+ 174 01b8 34080042		li	$t0, 66				# check for B
+ 175 01bc 34020003		li	$v0, 3				# set to burning
+ 176 01c0 10880007		beq	$a0, $t0, grid_text_end
+ 177 01c4 34080074		li	$t0, 116			# check for t
+ 178 01c8 34020002		li	$v0, 2				# set to tree
+ 179 01cc 10880004		beq	$a0, $t0, grid_text_end
+ 180 01d0 3408002E		li	$t0, 46				# check for .
+ 181 01d4 34020001		li	$v0, 1				# set to grass
+ 182 01d8 10880001		beq	$a0, $t0, grid_text_end
+ 183 01dc               	
+ 184 01dc 2402FFFF		li	$v0, -1				# error
+ 185 01e0               grid_text_end:
+ 186 01e0 8FBF0000		lw	$ra, 0($sp)
+ 187 01e4 23BD0004		addi	$sp, $sp, 4
+ 188 01e8 03E00008		jr	$ra
 
 
 PRINT_INT          = 00000001   
@@ -214,22 +213,22 @@ READ_CHAR          = 0000000C
 READ_INT           = 00000005   
 READ_STRING        = 00000008   
 grid_set             ******** XG
-grid_text_end        000001E4 R  text 
-grid_text_to_int     000001B4 R  text 
+grid_text_end        000001E0 R  text 
+grid_text_to_int     000001B0 R  text 
 input                00000000 RG text 
 input_data           00000000 R  data 
 input_direction      0000002C R  data 
 input_grid_data      0000000C R  data 
 main                 ******** XG
-read_grid_finish     00000180 R  text 
-read_grid_loop       00000118 R  text 
-read_grid_start      00000108 R  text 
+read_grid_finish     0000017C R  text 
+read_grid_loop       00000114 R  text 
+read_grid_start      00000104 R  text 
 read_input_done      00000080 R  text 
-read_input_fail      00000100 R  text 
-read_input_finish    00000188 R  text 
+read_input_fail      000000FC R  text 
+read_input_finish    00000184 R  text 
 read_input_loop      00000044 R  text 
-read_input_pass      000000FC R  text 
+read_input_pass      000000F8 R  text 
 read_input_text      00000060 R  text 
-verify_end           00000168 R  text 
-verify_fail          00000174 R  text 
-verify_loop          0000013C R  text 
+verify_end           00000164 R  text 
+verify_fail          00000170 R  text 
+verify_loop          00000138 R  text 

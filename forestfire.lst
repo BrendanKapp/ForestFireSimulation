@@ -162,41 +162,41 @@
  132 00b4 02002821		move	$a1, $s0
  133 00b8 02203021		move	$a2, $s1
  134 00bc 0C000000		jal	print_grid
- 135 00c0               	# increment
- 136 00c0 22100001		addi	$s0, $s0, 1
- 137 00c4               	# loop over all grid spaces
- 138 00c4 34140000		li	$s4, 0				# x counter
- 139 00c8 2415FFFF		li	$s5, -1				# y counter
- 140 00cc               grid_loop_outer:
- 141 00cc 22B50001		addi	$s5, $s5, 1
- 142 00d0 34140000		li	$s4, 0				# reset x counter
- 143 00d4 12B1000F		beq	$s5, $s1, grid_loop_end
- 144 00d8               grid_loop_inner:
- 145 00d8               	
- 146 00d8               	# apple rule 1
- 147 00d8 02802021		move	$a0, $s4
- 148 00dc 02A02821		move	$a1, $s5
- 149 00e0 0C000000		jal	rule_1
- 150 00e4               	# apply rule 2
- 151 00e4 02802021		move	$a0, $s4
- 152 00e8 02A02821		move	$a1, $s5
- 153 00ec 02203021		move	$a2, $s1
- 154 00f0 0C000000		jal	rule_2
- 155 00f4               	# apply rule 3
- 156 00f4 02802021		move	$a0, $s4
- 157 00f8 02A02821		move	$a1, $s5
- 158 00fc 02203021		move	$a2, $s1
- 159 0100 02603821		move	$a3, $s3
- 160 0104 0C000000		jal	rule_3
- 161 0108               
- 162 0108 22940001		addi	$s4, $s4, 1
- 163 010c 1291FFEF		beq	$s4, $s1, grid_loop_outer
- 164 0110 08000036		j	grid_loop_inner
- 165 0114               grid_loop_end:
- 166 0114               	# copy generation
- 167 0114 0C000000		jal	grid_cycle	
- 168 0118               	# loop
- 169 0118 12120001		beq	$s0, $s2, main_done
+ 135 00c0               	# loop over all grid spaces
+ 136 00c0 34140000		li	$s4, 0				# x counter
+ 137 00c4 2415FFFF		li	$s5, -1				# y counter
+ 138 00c8               grid_loop_outer:
+ 139 00c8 22B50001		addi	$s5, $s5, 1
+ 140 00cc 34140000		li	$s4, 0				# reset x counter
+ 141 00d0 12B1000F		beq	$s5, $s1, grid_loop_end
+ 142 00d4               grid_loop_inner:
+ 143 00d4               	
+ 144 00d4               	# apple rule 1
+ 145 00d4 02802021		move	$a0, $s4
+ 146 00d8 02A02821		move	$a1, $s5
+ 147 00dc 0C000000		jal	rule_1
+ 148 00e0               	# apply rule 2
+ 149 00e0 02802021		move	$a0, $s4
+ 150 00e4 02A02821		move	$a1, $s5
+ 151 00e8 02203021		move	$a2, $s1
+ 152 00ec 0C000000		jal	rule_2
+ 153 00f0               	# apply rule 3
+ 154 00f0 02802021		move	$a0, $s4
+ 155 00f4 02A02821		move	$a1, $s5
+ 156 00f8 02203021		move	$a2, $s1
+ 157 00fc 02603821		move	$a3, $s3
+ 158 0100 0C000000		jal	rule_3
+ 159 0104               
+ 160 0104 22940001		addi	$s4, $s4, 1
+ 161 0108 1291FFEF		beq	$s4, $s1, grid_loop_outer
+ 162 010c 08000035		j	grid_loop_inner
+ 163 0110               grid_loop_end:
+ 164 0110               	# copy generation
+ 165 0110 0C000000		jal	grid_cycle	
+ 166 0114               	# loop
+ 167 0114 12120002		beq	$s0, $s2, main_done
+ 168 0118               	# increment
+ 169 0118 22100001		addi	$s0, $s0, 1
  170 011c 0800002C		j	main_loop
  171 0120               	
  172 0120               main_done:
@@ -222,9 +222,9 @@ error_size            00000058 R  text
 error_wind            00000070 R  text 
 grid_create           ******** XG
 grid_cycle            ******** XG
-grid_loop_end         00000114 R  text 
-grid_loop_inner       000000D8 R  text 
-grid_loop_outer       000000CC R  text 
+grid_loop_end         00000110 R  text 
+grid_loop_inner       000000D4 R  text 
+grid_loop_outer       000000C8 R  text 
 input                 ******** XG
 input_failed          00000034 R  text 
 input_failed_text     00000000 R  data 
