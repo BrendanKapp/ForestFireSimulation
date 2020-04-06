@@ -49,6 +49,7 @@ main:
 	sw	$s3, 8($sp)
 	sw	$s2, 4($sp)
 	sw	$s1, 0($sp)
+
 	jal	input
 	li	$t0, -1
 	bne	$v0, $t0, input_success		# check if the return given
@@ -56,6 +57,14 @@ main:
 input_failed:
 	li	$v0, PRINT_STRING
 	la	$a0, input_failed_text
+	syscall
+
+	li	$v0, PRINT_INT
+	move	$a0, $v1
+	syscall
+	
+	li	$v0, PRINT_STRING
+	la	$a0, newline
 	syscall
 	j	main_done
 input_success:

@@ -55,67 +55,77 @@
   49 0018 AFB30008		sw	$s3, 8($sp)
   50 001c AFB20004		sw	$s2, 4($sp)
   51 0020 AFB10000		sw	$s1, 0($sp)
-  52 0024 0C000000		jal	input
-  53 0028 2408FFFF		li	$t0, -1
-  54 002c 14480005		bne	$v0, $t0, input_success		# check if the return given
-  55 0030               						#  is -1 (fail) or success 		
-  56 0030               input_failed:
-  57 0030 34020004		li	$v0, PRINT_STRING
-  58 0034 3C040000		la	$a0, input_failed_text
+  52 0024               
+  53 0024 0C000000		jal	input
+  54 0028 2408FFFF		li	$t0, -1
+  55 002c 1448000C		bne	$v0, $t0, input_success		# check if the return given
+  56 0030               						#  is -1 (fail) or success 		
+  57 0030               input_failed:
+  58 0030 34020004		li	$v0, PRINT_STRING
+  59 0034 3C040000		la	$a0, input_failed_text
      0038 34840000
-  59 003c 0000000C		syscall
-  60 0040 0800002C		j	main_done
-  61 0044               input_success:
-  62 0044 00404821		move	$t1, $v0			# print success message
-  63 0048 34020004		li	$v0, PRINT_STRING
-  64 004c 3C040000		la	$a0, input_success_text
-     0050 34840000
-  65 0054 0000000C		syscall
-  66 0058               
-  67 0058 34020001		li	$v0, PRINT_INT			# print address
-  68 005c 01202021		move	$a0, $t1
-  69 0060 0000000C		syscall
-  70 0064               	
-  71 0064 34020004		li	$v0, PRINT_STRING
-  72 0068 3C040000		la	$a0, newline
+  60 003c 0000000C		syscall
+  61 0040               
+  62 0040 34020001		li	$v0, PRINT_INT
+  63 0044 00602021		move	$a0, $v1
+  64 0048 0000000C		syscall
+  65 004c               	
+  66 004c 34020004		li	$v0, PRINT_STRING
+  67 0050 3C040000		la	$a0, newline
+     0054 34840000
+  68 0058 0000000C		syscall
+  69 005c 08000033		j	main_done
+  70 0060               input_success:
+  71 0060 00404821		move	$t1, $v0			# print success message
+  72 0064 34020004		li	$v0, PRINT_STRING
+  73 0068 3C040000		la	$a0, input_success_text
      006c 34840000
-  73 0070 0000000C		syscall
-  74 0074               main_loop_start:
-  75 0074 0C000000		jal	grid_create			# create the grid
-  76 0078 0040B821		move	$s7, $v0			# grid address
-  77 007c 34100000		li	$s0, 0 				# generations counter
-  78 0080 8D310000		lw	$s1, 0($t1)			# size
-  79 0084 8D320004		lw	$s2, 4($t1)			# generations
-  80 0088 8D330008		lw	$s3, 8($t1)			# wind
-  81 008c 0C000000		jal	print_banner
-  82 0090               main_loop:
-  83 0090               	# print
-  84 0090 02E02021		move	$a0, $s7
-  85 0094 02002821		move	$a1, $s0
-  86 0098 02203021		move	$a2, $s1
-  87 009c 0C000000		jal	print_grid
-  88 00a0               	# increment
-  89 00a0 22100001		addi	$s0, $s0, 1
-  90 00a4               	# apple rule 1
-  91 00a4               	# apply rule 2
-  92 00a4               	# apply rule 3
-  93 00a4               	# copy generation
-  94 00a4 0C000000		jal	grid_cycle	
-  95 00a8               	# loop
-  96 00a8 12120001		beq	$s0, $s2, main_done
-  97 00ac 08000024		j	main_loop
-  98 00b0               	
-  99 00b0               main_done:
- 100 00b0 8FB10000		lw	$s1, 0($sp)
- 101 00b4 8FB20004		lw	$s2, 4($sp)
- 102 00b8 8FB30008		lw	$s3, 8($sp)
- 103 00bc 8FB4000C		lw	$s4, 12($sp)
- 104 00c0 8FB50010		lw	$s5, 16($sp)
- 105 00c4 8FB60014		lw	$s6, 20($sp)
- 106 00c8 8FB70018		lw	$s7, 24($sp)
- 107 00cc 8FBF001C		lw	$ra, 28($sp)
- 108 00d0 23BD0020		addi	$sp, $sp, 32
- 109 00d4 03E00008		jr	$ra
+  74 0070 0000000C		syscall
+  75 0074               
+  76 0074 34020001		li	$v0, PRINT_INT			# print address
+  77 0078 01202021		move	$a0, $t1
+  78 007c 0000000C		syscall
+  79 0080               	
+  80 0080 34020004		li	$v0, PRINT_STRING
+  81 0084 3C040000		la	$a0, newline
+     0088 34840000
+  82 008c 0000000C		syscall
+  83 0090               main_loop_start:
+  84 0090 0C000000		jal	grid_create			# create the grid
+  85 0094 0040B821		move	$s7, $v0			# grid address
+  86 0098 34100000		li	$s0, 0 				# generations counter
+  87 009c 8D310000		lw	$s1, 0($t1)			# size
+  88 00a0 8D320004		lw	$s2, 4($t1)			# generations
+  89 00a4 8D330008		lw	$s3, 8($t1)			# wind
+  90 00a8 0C000000		jal	print_banner
+  91 00ac               main_loop:
+  92 00ac               	# print
+  93 00ac 02E02021		move	$a0, $s7
+  94 00b0 02002821		move	$a1, $s0
+  95 00b4 02203021		move	$a2, $s1
+  96 00b8 0C000000		jal	print_grid
+  97 00bc               	# increment
+  98 00bc 22100001		addi	$s0, $s0, 1
+  99 00c0               	# apple rule 1
+ 100 00c0               	# apply rule 2
+ 101 00c0               	# apply rule 3
+ 102 00c0               	# copy generation
+ 103 00c0 0C000000		jal	grid_cycle	
+ 104 00c4               	# loop
+ 105 00c4 12120001		beq	$s0, $s2, main_done
+ 106 00c8 0800002B		j	main_loop
+ 107 00cc               	
+ 108 00cc               main_done:
+ 109 00cc 8FB10000		lw	$s1, 0($sp)
+ 110 00d0 8FB20004		lw	$s2, 4($sp)
+ 111 00d4 8FB30008		lw	$s3, 8($sp)
+ 112 00d8 8FB4000C		lw	$s4, 12($sp)
+ 113 00dc 8FB50010		lw	$s5, 16($sp)
+ 114 00e0 8FB60014		lw	$s6, 20($sp)
+ 115 00e4 8FB70018		lw	$s7, 24($sp)
+ 116 00e8 8FBF001C		lw	$ra, 28($sp)
+ 117 00ec 23BD0020		addi	$sp, $sp, 32
+ 118 00f0 03E00008		jr	$ra
 
 
 PRINT_INT           = 00000001   
@@ -126,12 +136,12 @@ grid_cycle            ******** XG
 input                 ******** XG
 input_failed          00000030 R  text 
 input_failed_text     00000000 R  data 
-input_success         00000044 R  text 
+input_success         00000060 R  text 
 input_success_text    0000000E R  data 
 main                  00000000 RG text 
-main_done             000000B0 R  text 
-main_loop             00000090 R  text 
-main_loop_start       00000074 R  text 
+main_done             000000CC R  text 
+main_loop             000000AC R  text 
+main_loop_start       00000090 R  text 
 newline               0000001C R  data 
 output                ******** XG
 print_banner          ******** XG
