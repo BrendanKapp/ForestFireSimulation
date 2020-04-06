@@ -116,15 +116,15 @@ read_grid_loop:
 	li	$a1, 32	
 	li	$v0, READ_STRING
 	syscall
-	la	$a0, input_grid_data
-	li	$v0, PRINT_STRING
-	syscall
+	#la	$a0, input_grid_data
+	#li	$v0, PRINT_STRING
+	#syscall
 	# verify each line (either continue or error)
 	la	$s4, input_grid_data		# verify address
-	move	$s3, $s1			# verify counter
+	li	$s3, 0				# verify counter
 	li	$s5, -1				# error code
 verify_loop:
-	lw	$a0, 0($s4)
+	lb	$a0, 0($s4)
 	jal	grid_text_to_int
 	beq	$v0, $s5, verify_fail
 	# save each piece
@@ -134,7 +134,7 @@ verify_loop:
 	jal	grid_set
 
 	addi	$s3, $s3, 1
-	addi	$s4, $s4, 4
+	addi	$s4, $s4, 1
 	beq	$s3, $s1, verify_end
 	j	verify_loop
 verify_end:
@@ -144,10 +144,10 @@ verify_end:
 	j	read_grid_loop
 verify_fail:
 	li	$v0, -1
-	li	$v1, -1
+	move	$v1, $s3
 	j	read_input_finish
 read_grid_finish:
-	
+	la	$v0, input_data	
 read_input_finish:
 	lw	$s0, 0($sp)
 	lw	$s1, 4($sp)
@@ -169,7 +169,6 @@ read_input_finish:
 grid_text_to_int:
 	addi	$sp, $sp, -4
 	sw	$ra, 0($sp)
-
 						# ascii values to check for
 						# B (66), t (116), . (46)
 	li	$t0, 66				# check for B
