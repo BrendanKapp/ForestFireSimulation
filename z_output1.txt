@@ -1,0 +1,240 @@
+Copying files...done
+
+ON-TIME submission of project1
+Creating Makefile
+make forestfire.out
+/home/fac/wrc/bin/rasm -l forestfire.asm > forestfire.lst
+/home/fac/wrc/bin/rasm -l grid.asm > grid.lst
+/home/fac/wrc/bin/rasm -l input.asm > input.lst
+/home/fac/wrc/bin/rasm -l output.asm > output.lst
+/home/fac/wrc/bin/rasm -l rules.asm > rules.lst
+/home/fac/wrc/bin/rlink -m -o forestfire.out forestfire.obj grid.obj input.obj output.obj rules.obj > forestfire.map
+**********************************************
+
+Running 31 tests - please wait
+
+**********************************************
+
+===== Test 1
+/home/fac/wrc/bin/rsim forestfire.out < input.1 > OUT.1
+
+Your output did not match the correct output.
+Your output:
++-------------+
+| FOREST FIRE |
++-------------+
+
+==== #0 ====
++-----+
+|..t..|
+|.tBt.|
+|..tt.|
+|....t|
++-----+
+
+==== #1 ====
++-----+
+|..t..|
+|.tBt.|
+|..tt.|
+|....t|
++-----+
+
+==== #2 ====
++-----+
+|.tB..|
+|tB.B.|
+|.tBt.|
+|...tt|
++-----+
+
+==== #3 ====
++-----+
+|tB...|
+|B....|
+|tB.B.|
+|..ttt|
++-----+
+
+----------
+Correct output:
++-------------+
+| FOREST FIRE |
++-------------+
+
+==== #0 ====
++-----+
+|t....|
+|..t..|
+|.tBt.|
+|..tt.|
+|....t|
++-----+
+
+==== #1 ====
++-----+
+|tt...|
+|..Bt.|
+|.B.Bt|
+|..Btt|
+|....t|
++-----+
+
+==== #2 ====
++-----+
+|ttt..|
+|...Bt|
+|....B|
+|...Bt|
+|....t|
++-----+
+
+==== #3 ====
++-----+
+|tttt.|
+|....B|
+|.....|
+|....B|
+|....t|
++-----+
+
+==== #4 ====
++-----+
+|ttttt|
+|.....|
+|.....|
+|.....|
+|....B|
++-----+
+
+----------
+Differences (OUT.1 is yours; answer.1 is correct):
+*** OUT.1	2020-04-06 01:04:57.360831000 -0400
+--- answer.1	2020-03-23 10:38:02.646759000 -0400
+***************
+*** 4,9 ****
+--- 4,10 ----
+  
+  ==== #0 ====
+  +-----+
++ |t....|
+  |..t..|
+  |.tBt.|
+  |..tt.|
+***************
+*** 12,36 ****
+  
+  ==== #1 ====
+  +-----+
+! |..t..|
+! |.tBt.|
+! |..tt.|
+  |....t|
+  +-----+
+  
+  ==== #2 ====
+  +-----+
+! |.tB..|
+! |tB.B.|
+! |.tBt.|
+! |...tt|
+  +-----+
+  
+  ==== #3 ====
+  +-----+
+! |tB...|
+! |B....|
+! |tB.B.|
+! |..ttt|
+  +-----+
+  
+--- 13,49 ----
+  
+  ==== #1 ====
+  +-----+
+! |tt...|
+! |..Bt.|
+! |.B.Bt|
+! |..Btt|
+  |....t|
+  +-----+
+  
+  ==== #2 ====
+  +-----+
+! |ttt..|
+! |...Bt|
+! |....B|
+! |...Bt|
+! |....t|
+  +-----+
+  
+  ==== #3 ====
+  +-----+
+! |tttt.|
+! |....B|
+! |.....|
+! |....B|
+! |....t|
+! +-----+
+! 
+! ==== #4 ====
+! +-----+
+! |ttttt|
+! |.....|
+! |.....|
+! |.....|
+! |....B|
+  +-----+
+  
+
+
+===== Test 3
+/home/fac/wrc/bin/rsim forestfire.out < input.3 > OUT.3
+Your output is correct!
+
+===== Test 5
+/home/fac/wrc/bin/rsim forestfire.out < input.5 > OUT.5
+Your output is correct!
+
+===== Test 6
+/home/fac/wrc/bin/rsim forestfire.out < input.6 > OUT.6
+
+Your output did not match the correct output.
+Your output:
++-------------+
+| FOREST FIRE |
++-------------+
+
+ERROR: invalid grid size
+----------
+Correct output:
++-------------+
+| FOREST FIRE |
++-------------+
+
+ERROR: invalid wind direction
+----------
+Differences (OUT.6 is yours; answer.6 is correct):
+*** OUT.6	2020-04-06 01:04:58.669645000 -0400
+--- answer.6	2020-03-23 10:38:03.465714000 -0400
+***************
+*** 2,5 ****
+  | FOREST FIRE |
+  +-------------+
+  
+! ERROR: invalid grid size
+--- 2,5 ----
+  | FOREST FIRE |
+  +-------------+
+  
+! ERROR: invalid wind direction
+
+
+===== Test 8
+/home/fac/wrc/bin/rsim forestfire.out < input.8 > OUT.8
+Your output is correct!
+
+Files being saved:
+forestfire.asm grid.asm input.asm output.asm rules.asm
+
+project1 has been submitted WITH ERRORS.

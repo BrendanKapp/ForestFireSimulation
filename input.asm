@@ -91,6 +91,7 @@ read_input_done:
 	li	$v1, 3				# error code 3
 	li	$t2, 78
 	lw	$t4, 16($t1)
+	sw	$t4, 8($t1)			# reposition the wind
 	move	$v1, $t4
 	beq	$t4, $t2, read_input_pass
 	li	$t2, 83

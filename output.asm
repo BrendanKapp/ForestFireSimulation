@@ -91,7 +91,7 @@ print_grid:
 					# print grid	
 			
 	li	$s4, 0			# x counter
-	li	$s5, 0			# y counter
+	li	$s5, -1			# y counter
 	
 	move	$a0, $s2
 	jal	print_board_edge	

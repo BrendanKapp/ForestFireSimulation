@@ -1,22 +1,22 @@
 Load map
 ========
 
-Module:  forest_fire.obj
+Module:  forestfire.obj
  Text segment:  324 bytes, load point 0x00400000
  Data segment:  160 bytes, load point 0x10000000
  Symbols:
                 Name Section Mode    Value
-     main_loop_start   Text   R   0x00400090
+     main_loop_start   Text   R   0x00400094
     invalid_wind_dir   Data   R   0x1000005c
        grid_loop_end   Text   R   0x00400110
-          error_size   Text   R   0x00400054
+          error_size   Text   R   0x00400058
    invalid_char_grid   Data   R   0x1000007b
      invalid_num_gen   Data   R   0x10000036
-       input_success   Text   R   0x0040008c
+       input_success   Text   R   0x00400090
             READ_INT          A   0x00000005
-        input_failed   Text   R   0x00400030
+        input_failed   Text   R   0x00400034
            main_loop   Text   R   0x004000ac
-           error_gen   Text   R   0x00400060
+           error_gen   Text   R   0x00400064
      grid_loop_outer   Text   R   0x004000c8
              newline   Data   R   0x1000009d
    invalid_grid_size   Data   R   0x1000001c
@@ -25,11 +25,11 @@ Module:  forest_fire.obj
                 main   Text   RG  0x00400000
   input_success_text   Data   R   0x1000000e
            main_done   Text   R   0x0040011c
-          error_wind   Text   R   0x0040006c
+          error_wind   Text   R   0x00400070
    input_failed_text   Data   R   0x10000000
-           error_end   Text   R   0x00400084
+           error_end   Text   R   0x00400088
            PRINT_INT          A   0x00000001
-          error_char   Text   R   0x00400078
+          error_char   Text   R   0x0040007c
 
 Module:  input.obj
  Text segment:  492 bytes, load point 0x00400144

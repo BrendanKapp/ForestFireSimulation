@@ -172,15 +172,15 @@ rule_3:
 	
 	# check wind (N, S, E, W)
 	# (78, 83, 69, 87)
-	li	$t2, 78
+	li	$t2, 78				# North
 	beq	$s3, $t2, tree_above
 	li	$t2, 83
-	beq	$s3, $t2, tree_below
+	beq	$s3, $t2, tree_below		# South
 	li	$t2, 69
-	beq	$s3, $t2, tree_after
+	beq	$s3, $t2, tree_after		# East
 	li	$t2, 87
-	beq	$s3, $t2, tree_before
-	
+	beq	$s3, $t2, tree_before		# West
+	j	rule_3_end			# Error	
 tree_above:
 	# check above
 	addi	$t0, $a0, -1

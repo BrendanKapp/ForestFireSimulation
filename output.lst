@@ -106,7 +106,7 @@
   91 0080               					# print grid	
   92 0080               			
   93 0080 34140000		li	$s4, 0			# x counter
-  94 0084 34150000		li	$s5, 0			# y counter
+  94 0084 2415FFFF		li	$s5, -1			# y counter
   95 0088               	
   96 0088 02402021		move	$a0, $s2
   97 008c 0C000046		jal	print_board_edge	

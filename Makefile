@@ -28,12 +28,12 @@ RLINK = /home/fac/wrc/bin/rlink
 #
 # Object files
 #
-OBJECTS = forest_fire.obj input.obj output.obj grid.obj rules.obj
+OBJECTS = forestfire.obj input.obj output.obj grid.obj rules.obj
 
 #
 # Main target
 #
 forestfire.out:	$(OBJECTS)
-	$(RLINK) -m -o forest_fire.out $(OBJECTS) > forest_fire.map
+	$(RLINK) -m -o forestfire.out $(OBJECTS) > forestfire.map
 
 

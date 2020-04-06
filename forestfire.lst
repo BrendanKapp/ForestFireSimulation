@@ -1,0 +1,247 @@
+   1 0000               #
+   2 0000               # @author: Brendan Kapp (bek7883)
+   3 0000               #
+   4 0000               # This is forestfire main program and is responsible for the main loop
+   5 0000               # of the project, it involves calling all the nessicary functions that
+   6 0000               # manage the main state of the simulation.
+   7 0000               
+   8 0000               #
+   9 0000               # CONSTANTS
+  10 0000               #
+  11 0000               
+  12 0000               PRINT_STRING = 4
+  13 0000               READ_INT = 5
+  14 0000               PRINT_INT = 1
+  15 0000               
+  16 0000               #
+  17 0000               # DATA
+  18 0000               #
+  19 0000               
+  20 0000               	.data
+  21 0000               input_failed_text:
+  22 0000 496E7075		.asciiz	"Input failed\n"
+          74206661
+          696C6564
+          0A00    
+  23 000e               input_success_text:
+  24 000e 496E7075		.asciiz "Input passed\n"
+          74207061
+          73736564
+          0A00    
+  25 001c               invalid_grid_size:
+  26 001c 4552524F		.asciiz "ERROR: invalid grid size\n"
+          523A2069
+          6E76616C
+          69642067
+          72696420
+          73697A65
+  27 0036               invalid_num_gen:
+  28 0036 4552524F		.asciiz "ERROR: invalid number of generations\n"
+          523A2069
+          6E76616C
+          6964206E
+          756D6265
+          72206F66
+  29 005c               invalid_wind_dir:
+  30 005c 4552524F		.asciiz "ERROR: invalid wind direction\n"
+          523A2069
+          6E76616C
+          69642077
+          696E6420
+          64697265
+  31 007b               invalid_char_grid:
+  32 007b 4552524F		.asciiz "ERROR: invalid character in grid\n"
+          523A2069
+          6E76616C
+          69642063
+          68617261
+          63746572
+  33 009d               newline:
+  34 009d 0A00    		.asciiz "\n"
+  35 009f               
+  36 009f               #
+  37 009f               # CODE
+  38 009f               #
+  39 0000               	.text
+  40 0000               	.align	2
+  41 0000               
+  42 0000               	.globl	main
+  43 0000               	.globl	input
+  44 0000               	.globl	output
+  45 0000               	.globl	grid_create
+  46 0000               	.globl	grid_cycle
+  47 0000               	.globl	print_banner
+  48 0000               	.globl	print_grid
+  49 0000               	.globl	rule_1
+  50 0000               	.globl	rule_2
+  51 0000               	.globl	rule_3
+  52 0000               
+  53 0000               main:
+  54 0000 23BDFFE0		addi	$sp, $sp, -32
+  55 0004 AFBF001C		sw	$ra, 28($sp)
+  56 0008 AFB70018		sw	$s7, 24($sp)
+  57 000c AFB60014		sw	$s6, 20($sp)
+  58 0010 AFB50010		sw	$s5, 16($sp)
+  59 0014 AFB4000C		sw	$s4, 12($sp)
+  60 0018 AFB30008		sw	$s3, 8($sp)
+  61 001c AFB20004		sw	$s2, 4($sp)
+  62 0020 AFB10000		sw	$s1, 0($sp)
+  63 0024               
+  64 0024 0C000000		jal	print_banner
+  65 0028               
+  66 0028 0C000000		jal	input
+  67 002c 2408FFFF		li	$t0, -1
+  68 0030 14480017		bne	$v0, $t0, input_success		# check if the return given
+  69 0034               						#  is -1 (fail) or success 		
+  70 0034               input_failed:
+  71 0034 34020004		li	$v0, PRINT_STRING
+  72 0038 34090001		li	$t1, 1
+  73 003c 10690006		beq	$v1, $t1, error_size
+  74 0040 34090002		li	$t1, 2
+  75 0044 10690007		beq	$v1, $t1, error_gen
+  76 0048 34090003		li	$t1, 3
+  77 004c 10690008		beq	$v1, $t1, error_wind
+  78 0050 34090004		li	$t1, 4
+  79 0054 10690009		beq	$v1, $t1, error_char
+  80 0058               error_size:
+  81 0058 3C040000		la	$a0, invalid_grid_size
+     005c 34840000
+  82 0060 08000022		j	error_end
+  83 0064               error_gen:
+  84 0064 3C040000		la	$a0, invalid_num_gen
+     0068 34840000
+  85 006c 08000022		j	error_end
+  86 0070               error_wind:
+  87 0070 3C040000		la	$a0, invalid_wind_dir
+     0074 34840000
+  88 0078 08000022		j	error_end	
+  89 007c               error_char:
+  90 007c 3C040000		la	$a0, invalid_char_grid
+     0080 34840000
+  91 0084 08000022		j	error_end
+  92 0088               error_end:
+  93 0088 0000000C		syscall
+  94 008c               
+  95 008c               
+  96 008c               	#li	$v0, PRINT_STRING
+  97 008c               	#la	$a0, input_failed_text
+  98 008c               	#syscall
+  99 008c               
+ 100 008c               	#li	$v0, PRINT_INT
+ 101 008c               	#move	$a0, $v1
+ 102 008c               	#syscall
+ 103 008c               	
+ 104 008c               	#li	$v0, PRINT_STRING
+ 105 008c               	#la	$a0, newline
+ 106 008c               	#syscall
+ 107 008c 08000048		j	main_done
+ 108 0090               input_success:
+ 109 0090 00404821		move	$t1, $v0			# print success message
+ 110 0094               	#li	$v0, PRINT_STRING
+ 111 0094               	#la	$a0, input_success_text
+ 112 0094               	#syscall
+ 113 0094               
+ 114 0094               	#li	$v0, PRINT_INT			# print address
+ 115 0094               	#move	$a0, $t1
+ 116 0094               	#syscall
+ 117 0094               	
+ 118 0094               	#li	$v0, PRINT_STRING
+ 119 0094               	#la	$a0, newline
+ 120 0094               	#syscall
+ 121 0094               main_loop_start:
+ 122 0094 0C000000		jal	grid_create			# create the grid
+ 123 0098 0040B821		move	$s7, $v0			# grid address
+ 124 009c 34100000		li	$s0, 0 				# generations counter
+ 125 00a0 8D310000		lw	$s1, 0($t1)			# size
+ 126 00a4 8D320004		lw	$s2, 4($t1)			# generations
+ 127 00a8 8D330008		lw	$s3, 8($t1)			# wind
+ 128 00ac 0C000000		jal	grid_cycle			# cycle the grid
+ 129 00b0               main_loop:
+ 130 00b0               	# print
+ 131 00b0 02E02021		move	$a0, $s7
+ 132 00b4 02002821		move	$a1, $s0
+ 133 00b8 02203021		move	$a2, $s1
+ 134 00bc 0C000000		jal	print_grid
+ 135 00c0               	# increment
+ 136 00c0 22100001		addi	$s0, $s0, 1
+ 137 00c4               	# loop over all grid spaces
+ 138 00c4 34140000		li	$s4, 0				# x counter
+ 139 00c8 2415FFFF		li	$s5, -1				# y counter
+ 140 00cc               grid_loop_outer:
+ 141 00cc 22B50001		addi	$s5, $s5, 1
+ 142 00d0 34140000		li	$s4, 0				# reset x counter
+ 143 00d4 12B1000F		beq	$s5, $s1, grid_loop_end
+ 144 00d8               grid_loop_inner:
+ 145 00d8               	
+ 146 00d8               	# apple rule 1
+ 147 00d8 02802021		move	$a0, $s4
+ 148 00dc 02A02821		move	$a1, $s5
+ 149 00e0 0C000000		jal	rule_1
+ 150 00e4               	# apply rule 2
+ 151 00e4 02802021		move	$a0, $s4
+ 152 00e8 02A02821		move	$a1, $s5
+ 153 00ec 02203021		move	$a2, $s1
+ 154 00f0 0C000000		jal	rule_2
+ 155 00f4               	# apply rule 3
+ 156 00f4 02802021		move	$a0, $s4
+ 157 00f8 02A02821		move	$a1, $s5
+ 158 00fc 02203021		move	$a2, $s1
+ 159 0100 02603821		move	$a3, $s3
+ 160 0104 0C000000		jal	rule_3
+ 161 0108               
+ 162 0108 22940001		addi	$s4, $s4, 1
+ 163 010c 1291FFEF		beq	$s4, $s1, grid_loop_outer
+ 164 0110 08000036		j	grid_loop_inner
+ 165 0114               grid_loop_end:
+ 166 0114               	# copy generation
+ 167 0114 0C000000		jal	grid_cycle	
+ 168 0118               	# loop
+ 169 0118 12120001		beq	$s0, $s2, main_done
+ 170 011c 0800002C		j	main_loop
+ 171 0120               	
+ 172 0120               main_done:
+ 173 0120 8FB10000		lw	$s1, 0($sp)
+ 174 0124 8FB20004		lw	$s2, 4($sp)
+ 175 0128 8FB30008		lw	$s3, 8($sp)
+ 176 012c 8FB4000C		lw	$s4, 12($sp)
+ 177 0130 8FB50010		lw	$s5, 16($sp)
+ 178 0134 8FB60014		lw	$s6, 20($sp)
+ 179 0138 8FB70018		lw	$s7, 24($sp)
+ 180 013c 8FBF001C		lw	$ra, 28($sp)
+ 181 0140 23BD0020		addi	$sp, $sp, 32
+ 182 0144 03E00008		jr	$ra
+
+
+PRINT_INT           = 00000001   
+PRINT_STRING        = 00000004   
+READ_INT            = 00000005   
+error_char            0000007C R  text 
+error_end             00000088 R  text 
+error_gen             00000064 R  text 
+error_size            00000058 R  text 
+error_wind            00000070 R  text 
+grid_create           ******** XG
+grid_cycle            ******** XG
+grid_loop_end         00000114 R  text 
+grid_loop_inner       000000D8 R  text 
+grid_loop_outer       000000CC R  text 
+input                 ******** XG
+input_failed          00000034 R  text 
+input_failed_text     00000000 R  data 
+input_success         00000090 R  text 
+input_success_text    0000000E R  data 
+invalid_char_grid     0000007B R  data 
+invalid_grid_size     0000001C R  data 
+invalid_num_gen       00000036 R  data 
+invalid_wind_dir      0000005C R  data 
+main                  00000000 RG text 
+main_done             00000120 R  text 
+main_loop             000000B0 R  text 
+main_loop_start       00000094 R  text 
+newline               0000009D R  data 
+output                ******** XG
+print_banner          ******** XG
+print_grid            ******** XG
+rule_1                ******** XG
+rule_2                ******** XG
+rule_3                ******** XG
