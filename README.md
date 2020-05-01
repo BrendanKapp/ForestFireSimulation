@@ -4,7 +4,7 @@ This project is the final project for my Concepts of Computer Systems class at R
 
 The project was written entirely in MIPS R2000 and made to run on RSIM
 
-#overview
+# overview
 
 For this project you will write a program that runs the Forest-Fire model with some modifications. This model was originally introduced by Per Bak, Kan Chen, and Chao Tang in the 1990 paper "A forest-fire model and some thoughts on turbulence" and later refined by B. Drossel and F. Schwabl in 1992 in the paper Self-Organized Critical Forest-Fire Model.
 
@@ -20,7 +20,7 @@ A previous generation tree will turn an adjacent empty (grass) cell into a curre
 Besides above, a grass cell will not change from generation to generation.
 For this project, the grid will be a square of a fixed size determined by user input. The edges of the grid do not wrap.
 
-#input
+# input
 
 In order to run the simulation, the user must provide some basic information, and the initial grid. The input for the simulation will be provided to you on STDIN (from the keyboard). The input will consist of multiple line:
 The first line will be the grid size that specifies the length of the sides of the square grid.
