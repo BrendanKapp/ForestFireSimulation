@@ -101,7 +101,6 @@ read_input_done:
 	beq	$t4, $t2, read_input_pass
 	j	read_input_fail
 read_input_pass:
-	#la	$v0, input_data			# return the data address
 	j	read_grid_start
 read_input_fail:
 	la	$v0, -1				# return an error code
@@ -111,15 +110,16 @@ read_grid_start:
 	lw	$s1, 0($t1)			# size of grid
 	li	$s2, 0				# counter
 read_grid_loop:
-	# read each line of input
+#
+# read each line of input
+#
 	la	$a0, input_grid_data
 	li	$a1, 32	
 	li	$v0, READ_STRING
 	syscall
-	#la	$a0, input_grid_data
-	#li	$v0, PRINT_STRING
-	#syscall
-	# verify each line (either continue or error)
+#	
+# verify each line (either continue or error)
+#
 	la	$s4, input_grid_data		# verify address
 	li	$s3, 0				# verify counter
 	li	$s5, -1				# error code
@@ -127,7 +127,9 @@ verify_loop:
 	lb	$a0, 0($s4)
 	jal	grid_text_to_int
 	beq	$v0, $s5, verify_fail
-	# save each piece
+#
+# save each piece
+#
 	move	$a0, $s3			# x location
 	move	$a1, $s2			# y location
 	move	$a2, $v0			# value
@@ -138,7 +140,9 @@ verify_loop:
 	beq	$s3, $s1, verify_end
 	j	verify_loop
 verify_end:
-	# go to next line		
+#
+# go to next line
+#
 	addi	$s2, $s2, 1
 	beq	$s1, $s2, read_grid_finish
 	j	read_grid_loop

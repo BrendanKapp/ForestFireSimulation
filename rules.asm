@@ -85,46 +85,54 @@ rule_2:
 	jal	grid_get_old
 	li	$t1, 2
 	bne	$v0, $t1, rule_2_end
-	# check above
+#
+# check above
+#
 	addi	$t0, $a0, -1
 	slt	$t1, $t0, $zero			# 1 = val is neg, we skip
 	bne	$t1, $zero, check_below
-	# check if x - 1 is burning
+#
+# check if x - 1 is burning
+#
 	move	$a0, $t0
 	move	$a1, $s1
 	jal	grid_get_old
 	li	$t1, 3
 	beq	$v0, $t1, rule_2_burn
-	# check below
 check_below:
 	addi	$t2, $s2, -1			# grid boundary
 	addi	$t0, $s0, 1
 	slt	$t1, $t2, $t0			# 1 = val is to large, skip
 	bne	$t1, $zero, check_after	
-	# check if x + 1 is burning
+#	
+# check if x + 1 is burning
+#
 	move	$a0, $t0
 	move	$a1, $s1
 	jal	grid_get_old
 	li	$t1, 3
 	beq	$v0, $t1, rule_2_burn
-	# check after
+	
 check_after:
 	addi	$t2, $s2, -1			# grid boundary
 	addi	$t1, $s1, 1
 	slt	$t0, $t2, $t1			# 1 = val is to large, skip
 	bne	$t0, $zero, check_before
-	# check if y + 1 is burning
+#
+# check if y + 1 is burning
+#
 	move	$a0, $s0
 	move	$a1, $t1
 	jal	grid_get_old
 	li	$t1, 3
 	beq	$v0, $t1, rule_2_burn
-	# check before
 check_before:
 	addi	$t1, $s1, -1
 	slt	$t0, $s1, $zero			# 1 = val is neg, we skip
 	bne	$t0, $zero, rule_2_end
-	# check if y - 1 is burning
+#
+# check if y - 1 is burning
+#
 	move	$a0, $s0
 	move	$a1, $t1
 	jal	grid_get_old
@@ -169,9 +177,10 @@ rule_3:
 	jal	grid_get_old
 	li	$t1, 2
 	bne	$v0, $t1, rule_3_end
-	
-	# check wind (N, S, E, W)
-	# (78, 83, 69, 87)
+#
+# check wind (N, S, E, W)
+# (78, 83, 69, 87)
+#
 	li	$t2, 78				# North
 	beq	$s3, $t2, tree_before
 	li	$t2, 83
@@ -181,50 +190,54 @@ rule_3:
 	li	$t2, 87
 	beq	$s3, $t2, tree_above		# West
 	j	rule_3_end			# Error	
-tree_above:	# west
-	# check above
+tree_above:					# west
 	addi	$t0, $a0, -1
 	slt	$t1, $t0, $zero			# 1 = val is neg, we skip
 	bne	$t1, $zero, rule_3_end
-	# check if x - 1 is grass
+#	
+# check if x - 1 is grass
+#
 	move	$a0, $t0
 	move	$a1, $s1
 	jal	grid_get_old
 	li	$t1, 1
 	beq	$v0, $t1, rule_3_tree
 	j	rule_3_end
-	# check below
-tree_below:	# east
+tree_below:					# east
 	addi	$t2, $s2, -1			# grid boundary
 	addi	$t0, $s0, 1
 	slt	$t1, $t2, $t0			# 1 = val is to large, skip
 	bne	$t1, $zero, rule_3_end	
-	# check if x + 1 is grass
+#
+# check if x + 1 is grass
+#
 	move	$a0, $t0
 	move	$a1, $s1
 	jal	grid_get_old
 	li	$t1, 1
 	beq	$v0, $t1, rule_3_tree
 	j	rule_3_end
-	# check after
-tree_after:	# north
+tree_after:					# north
 	addi	$t2, $s2, -1			# grid boundary
 	addi	$t1, $s1, 1
 	slt	$t0, $t2, $t1			# 1 = val is to large, skip
 	bne	$t0, $zero, rule_3_end
-	# check if y + 1 is grass
+#
+# check if y + 1 is grass
+#
 	move	$a0, $s0
 	move	$a1, $t1
 	jal	grid_get_old
 	li	$t1, 1
 	beq	$v0, $t1, rule_3_tree
 	j	rule_3_end
-	# check before
-tree_before:	# south
+tree_before:					# south
 	addi	$t1, $s1, -1
 	slt	$t0, $s1, $zero			# 1 = val is neg, we skip
 	bne	$t0, $zero, rule_3_end
-	# check if y - 1 is grass
+#
+# check if y - 1 is grass
+#
 	move	$a0, $s0
 	move	$a1, $t1
 	jal	grid_get_old
@@ -232,8 +245,6 @@ tree_before:	# south
 	beq	$v0, $t1, rule_3_tree
 	j	rule_3_end
 rule_3_tree:
-	#move	$a0, $s0
-	#move	$a1, $s1
 	li	$a2, 2
 	jal	grid_set
 

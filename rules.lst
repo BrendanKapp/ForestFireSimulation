@@ -89,167 +89,178 @@
   85 00a8 0C000000		jal	grid_get_old
   86 00ac 34090002		li	$t1, 2
   87 00b0 14490027		bne	$v0, $t1, rule_2_end
-  88 00b4               	# check above
-  89 00b4 2088FFFF		addi	$t0, $a0, -1
-  90 00b8 0100482A		slt	$t1, $t0, $zero			# 1 = val is neg, we skip
-  91 00bc 15200005		bne	$t1, $zero, check_below
-  92 00c0               	# check if x - 1 is burning
-  93 00c0 01002021		move	$a0, $t0
-  94 00c4 02202821		move	$a1, $s1
-  95 00c8 0C000000		jal	grid_get_old
-  96 00cc 34090003		li	$t1, 3
-  97 00d0 1049001B		beq	$v0, $t1, rule_2_burn
-  98 00d4               	# check below
-  99 00d4               check_below:
- 100 00d4 224AFFFF		addi	$t2, $s2, -1			# grid boundary
- 101 00d8 22080001		addi	$t0, $s0, 1
- 102 00dc 0148482A		slt	$t1, $t2, $t0			# 1 = val is to large, skip
- 103 00e0 15200005		bne	$t1, $zero, check_after	
- 104 00e4               	# check if x + 1 is burning
- 105 00e4 01002021		move	$a0, $t0
- 106 00e8 02202821		move	$a1, $s1
- 107 00ec 0C000000		jal	grid_get_old
- 108 00f0 34090003		li	$t1, 3
- 109 00f4 10490012		beq	$v0, $t1, rule_2_burn
- 110 00f8               	# check after
- 111 00f8               check_after:
- 112 00f8 224AFFFF		addi	$t2, $s2, -1			# grid boundary
- 113 00fc 22290001		addi	$t1, $s1, 1
- 114 0100 0149402A		slt	$t0, $t2, $t1			# 1 = val is to large, skip
- 115 0104 15000005		bne	$t0, $zero, check_before
- 116 0108               	# check if y + 1 is burning
- 117 0108 02002021		move	$a0, $s0
- 118 010c 01202821		move	$a1, $t1
- 119 0110 0C000000		jal	grid_get_old
- 120 0114 34090003		li	$t1, 3
- 121 0118 10490009		beq	$v0, $t1, rule_2_burn
- 122 011c               	# check before
- 123 011c               check_before:
- 124 011c 2229FFFF		addi	$t1, $s1, -1
- 125 0120 0220402A		slt	$t0, $s1, $zero			# 1 = val is neg, we skip
- 126 0124 1500000A		bne	$t0, $zero, rule_2_end
- 127 0128               	# check if y - 1 is burning
- 128 0128 02002021		move	$a0, $s0
- 129 012c 01202821		move	$a1, $t1
- 130 0130 0C000000		jal	grid_get_old
- 131 0134 34090003		li	$t1, 3
- 132 0138 10490001		beq	$v0, $t1, rule_2_burn	
- 133 013c 08000054		j	rule_2_end
- 134 0140               rule_2_burn:
- 135 0140 02002021		move	$a0, $s0
- 136 0144 02202821		move	$a1, $s1
- 137 0148 34060003		li	$a2, 3
- 138 014c 0C000000		jal	grid_set
- 139 0150               rule_2_end:
- 140 0150 8FB00000		lw	$s0, 0($sp)
- 141 0154 8FB10004		lw	$s1, 4($sp)
- 142 0158 8FB20008		lw	$s2, 8($sp)
- 143 015c 8FB3000C		lw	$s3, 12($sp)
- 144 0160 8FBF0010		lw	$ra, 16($sp)
- 145 0164 23BD0014		addi	$sp, $sp, 20	
- 146 0168 03E00008		jr	$ra
- 147 016c               
- 148 016c               #
- 149 016c               # rule_3 applies the third rule to the grid location (x, y)
- 150 016c               # a previous generation tree will turn an adjacent empty
- 151 016c               # grass cell into a current generation tree if that
- 152 016c               # empty cell is in the given wind direction
- 153 016c               # parameters: a0 (x), a1 (y), a2 (grid size), a3 (wind direction)
- 154 016c               # returns: none
- 155 016c               #
- 156 016c               rule_3:
- 157 016c 23BDFFEC		addi	$sp, $sp, -20
- 158 0170 AFBF0010		sw	$ra, 16($sp)
- 159 0174 AFB3000C		sw	$s3, 12($sp)
- 160 0178 AFB20008		sw	$s2, 8($sp)
- 161 017c AFB10004		sw	$s1, 4($sp)
- 162 0180 AFB00000		sw	$s0, 0($sp)
- 163 0184               
- 164 0184 00808021		move	$s0, $a0
- 165 0188 00A08821		move	$s1, $a1
- 166 018c 00C09021		move	$s2, $a2
- 167 0190 00E09821		move	$s3, $a3
- 168 0194               	
- 169 0194 0C000000		jal	grid_get_old
- 170 0198 34090002		li	$t1, 2
- 171 019c 14490031		bne	$v0, $t1, rule_3_end
- 172 01a0               	
- 173 01a0               	# check wind (N, S, E, W)
- 174 01a0               	# (78, 83, 69, 87)
- 175 01a0 340A004E		li	$t2, 78				# North
- 176 01a4 126A0024		beq	$s3, $t2, tree_before
- 177 01a8 340A0053		li	$t2, 83
- 178 01ac 126A0018		beq	$s3, $t2, tree_after		# South
- 179 01b0 340A0045		li	$t2, 69
- 180 01b4 126A000C		beq	$s3, $t2, tree_below		# East
- 181 01b8 340A0057		li	$t2, 87
- 182 01bc 126A0001		beq	$s3, $t2, tree_above		# West
- 183 01c0 08000099		j	rule_3_end			# Error	
- 184 01c4               tree_above:	# west
- 185 01c4               	# check above
- 186 01c4 2088FFFF		addi	$t0, $a0, -1
- 187 01c8 0100482A		slt	$t1, $t0, $zero			# 1 = val is neg, we skip
- 188 01cc 15200025		bne	$t1, $zero, rule_3_end
- 189 01d0               	# check if x - 1 is grass
- 190 01d0 01002021		move	$a0, $t0
- 191 01d4 02202821		move	$a1, $s1
- 192 01d8 0C000000		jal	grid_get_old
- 193 01dc 34090001		li	$t1, 1
- 194 01e0 1049001E		beq	$v0, $t1, rule_3_tree
- 195 01e4 08000099		j	rule_3_end
- 196 01e8               	# check below
- 197 01e8               tree_below:	# east
- 198 01e8 224AFFFF		addi	$t2, $s2, -1			# grid boundary
- 199 01ec 22080001		addi	$t0, $s0, 1
- 200 01f0 0148482A		slt	$t1, $t2, $t0			# 1 = val is to large, skip
- 201 01f4 1520001B		bne	$t1, $zero, rule_3_end	
- 202 01f8               	# check if x + 1 is grass
- 203 01f8 01002021		move	$a0, $t0
- 204 01fc 02202821		move	$a1, $s1
- 205 0200 0C000000		jal	grid_get_old
- 206 0204 34090001		li	$t1, 1
- 207 0208 10490014		beq	$v0, $t1, rule_3_tree
- 208 020c 08000099		j	rule_3_end
- 209 0210               	# check after
- 210 0210               tree_after:	# north
- 211 0210 224AFFFF		addi	$t2, $s2, -1			# grid boundary
- 212 0214 22290001		addi	$t1, $s1, 1
- 213 0218 0149402A		slt	$t0, $t2, $t1			# 1 = val is to large, skip
- 214 021c 15000011		bne	$t0, $zero, rule_3_end
- 215 0220               	# check if y + 1 is grass
- 216 0220 02002021		move	$a0, $s0
- 217 0224 01202821		move	$a1, $t1
- 218 0228 0C000000		jal	grid_get_old
- 219 022c 34090001		li	$t1, 1
- 220 0230 1049000A		beq	$v0, $t1, rule_3_tree
- 221 0234 08000099		j	rule_3_end
- 222 0238               	# check before
- 223 0238               tree_before:	# south
- 224 0238 2229FFFF		addi	$t1, $s1, -1
- 225 023c 0220402A		slt	$t0, $s1, $zero			# 1 = val is neg, we skip
- 226 0240 15000008		bne	$t0, $zero, rule_3_end
- 227 0244               	# check if y - 1 is grass
- 228 0244 02002021		move	$a0, $s0
- 229 0248 01202821		move	$a1, $t1
- 230 024c 0C000000		jal	grid_get_old
- 231 0250 34090001		li	$t1, 1
- 232 0254 10490001		beq	$v0, $t1, rule_3_tree
- 233 0258 08000099		j	rule_3_end
- 234 025c               rule_3_tree:
- 235 025c               	#move	$a0, $s0
- 236 025c               	#move	$a1, $s1
- 237 025c 34060002		li	$a2, 2
- 238 0260 0C000000		jal	grid_set
- 239 0264               
- 240 0264               rule_3_end:
- 241 0264 8FB00000		lw	$s0, 0($sp)
- 242 0268 8FB10004		lw	$s1, 4($sp)
- 243 026c 8FB20008		lw	$s2, 8($sp)
- 244 0270 8FB3000C		lw	$s3, 12($sp)
- 245 0274 8FBF0010		lw	$ra, 16($sp)
- 246 0278 23BD0014		addi	$sp, $sp, 20	
- 247 027c 03E00008		jr	$ra
- 248 0280               
+  88 00b4               #
+  89 00b4               # check above
+  90 00b4               #
+  91 00b4 2088FFFF		addi	$t0, $a0, -1
+  92 00b8 0100482A		slt	$t1, $t0, $zero			# 1 = val is neg, we skip
+  93 00bc 15200005		bne	$t1, $zero, check_below
+  94 00c0               #
+  95 00c0               # check if x - 1 is burning
+  96 00c0               #
+  97 00c0 01002021		move	$a0, $t0
+  98 00c4 02202821		move	$a1, $s1
+  99 00c8 0C000000		jal	grid_get_old
+ 100 00cc 34090003		li	$t1, 3
+ 101 00d0 1049001B		beq	$v0, $t1, rule_2_burn
+ 102 00d4               check_below:
+ 103 00d4 224AFFFF		addi	$t2, $s2, -1			# grid boundary
+ 104 00d8 22080001		addi	$t0, $s0, 1
+ 105 00dc 0148482A		slt	$t1, $t2, $t0			# 1 = val is to large, skip
+ 106 00e0 15200005		bne	$t1, $zero, check_after	
+ 107 00e4               #	
+ 108 00e4               # check if x + 1 is burning
+ 109 00e4               #
+ 110 00e4 01002021		move	$a0, $t0
+ 111 00e8 02202821		move	$a1, $s1
+ 112 00ec 0C000000		jal	grid_get_old
+ 113 00f0 34090003		li	$t1, 3
+ 114 00f4 10490012		beq	$v0, $t1, rule_2_burn
+ 115 00f8               	
+ 116 00f8               check_after:
+ 117 00f8 224AFFFF		addi	$t2, $s2, -1			# grid boundary
+ 118 00fc 22290001		addi	$t1, $s1, 1
+ 119 0100 0149402A		slt	$t0, $t2, $t1			# 1 = val is to large, skip
+ 120 0104 15000005		bne	$t0, $zero, check_before
+ 121 0108               #
+ 122 0108               # check if y + 1 is burning
+ 123 0108               #
+ 124 0108 02002021		move	$a0, $s0
+ 125 010c 01202821		move	$a1, $t1
+ 126 0110 0C000000		jal	grid_get_old
+ 127 0114 34090003		li	$t1, 3
+ 128 0118 10490009		beq	$v0, $t1, rule_2_burn
+ 129 011c               check_before:
+ 130 011c 2229FFFF		addi	$t1, $s1, -1
+ 131 0120 0220402A		slt	$t0, $s1, $zero			# 1 = val is neg, we skip
+ 132 0124 1500000A		bne	$t0, $zero, rule_2_end
+ 133 0128               #
+ 134 0128               # check if y - 1 is burning
+ 135 0128               #
+ 136 0128 02002021		move	$a0, $s0
+ 137 012c 01202821		move	$a1, $t1
+ 138 0130 0C000000		jal	grid_get_old
+ 139 0134 34090003		li	$t1, 3
+ 140 0138 10490001		beq	$v0, $t1, rule_2_burn	
+ 141 013c 08000054		j	rule_2_end
+ 142 0140               rule_2_burn:
+ 143 0140 02002021		move	$a0, $s0
+ 144 0144 02202821		move	$a1, $s1
+ 145 0148 34060003		li	$a2, 3
+ 146 014c 0C000000		jal	grid_set
+ 147 0150               rule_2_end:
+ 148 0150 8FB00000		lw	$s0, 0($sp)
+ 149 0154 8FB10004		lw	$s1, 4($sp)
+ 150 0158 8FB20008		lw	$s2, 8($sp)
+ 151 015c 8FB3000C		lw	$s3, 12($sp)
+ 152 0160 8FBF0010		lw	$ra, 16($sp)
+ 153 0164 23BD0014		addi	$sp, $sp, 20	
+ 154 0168 03E00008		jr	$ra
+ 155 016c               
+ 156 016c               #
+ 157 016c               # rule_3 applies the third rule to the grid location (x, y)
+ 158 016c               # a previous generation tree will turn an adjacent empty
+ 159 016c               # grass cell into a current generation tree if that
+ 160 016c               # empty cell is in the given wind direction
+ 161 016c               # parameters: a0 (x), a1 (y), a2 (grid size), a3 (wind direction)
+ 162 016c               # returns: none
+ 163 016c               #
+ 164 016c               rule_3:
+ 165 016c 23BDFFEC		addi	$sp, $sp, -20
+ 166 0170 AFBF0010		sw	$ra, 16($sp)
+ 167 0174 AFB3000C		sw	$s3, 12($sp)
+ 168 0178 AFB20008		sw	$s2, 8($sp)
+ 169 017c AFB10004		sw	$s1, 4($sp)
+ 170 0180 AFB00000		sw	$s0, 0($sp)
+ 171 0184               
+ 172 0184 00808021		move	$s0, $a0
+ 173 0188 00A08821		move	$s1, $a1
+ 174 018c 00C09021		move	$s2, $a2
+ 175 0190 00E09821		move	$s3, $a3
+ 176 0194               	
+ 177 0194 0C000000		jal	grid_get_old
+ 178 0198 34090002		li	$t1, 2
+ 179 019c 14490031		bne	$v0, $t1, rule_3_end
+ 180 01a0               #
+ 181 01a0               # check wind (N, S, E, W)
+ 182 01a0               # (78, 83, 69, 87)
+ 183 01a0               #
+ 184 01a0 340A004E		li	$t2, 78				# North
+ 185 01a4 126A0024		beq	$s3, $t2, tree_before
+ 186 01a8 340A0053		li	$t2, 83
+ 187 01ac 126A0018		beq	$s3, $t2, tree_after		# South
+ 188 01b0 340A0045		li	$t2, 69
+ 189 01b4 126A000C		beq	$s3, $t2, tree_below		# East
+ 190 01b8 340A0057		li	$t2, 87
+ 191 01bc 126A0001		beq	$s3, $t2, tree_above		# West
+ 192 01c0 08000099		j	rule_3_end			# Error	
+ 193 01c4               tree_above:					# west
+ 194 01c4 2088FFFF		addi	$t0, $a0, -1
+ 195 01c8 0100482A		slt	$t1, $t0, $zero			# 1 = val is neg, we skip
+ 196 01cc 15200025		bne	$t1, $zero, rule_3_end
+ 197 01d0               #	
+ 198 01d0               # check if x - 1 is grass
+ 199 01d0               #
+ 200 01d0 01002021		move	$a0, $t0
+ 201 01d4 02202821		move	$a1, $s1
+ 202 01d8 0C000000		jal	grid_get_old
+ 203 01dc 34090001		li	$t1, 1
+ 204 01e0 1049001E		beq	$v0, $t1, rule_3_tree
+ 205 01e4 08000099		j	rule_3_end
+ 206 01e8               tree_below:					# east
+ 207 01e8 224AFFFF		addi	$t2, $s2, -1			# grid boundary
+ 208 01ec 22080001		addi	$t0, $s0, 1
+ 209 01f0 0148482A		slt	$t1, $t2, $t0			# 1 = val is to large, skip
+ 210 01f4 1520001B		bne	$t1, $zero, rule_3_end	
+ 211 01f8               #
+ 212 01f8               # check if x + 1 is grass
+ 213 01f8               #
+ 214 01f8 01002021		move	$a0, $t0
+ 215 01fc 02202821		move	$a1, $s1
+ 216 0200 0C000000		jal	grid_get_old
+ 217 0204 34090001		li	$t1, 1
+ 218 0208 10490014		beq	$v0, $t1, rule_3_tree
+ 219 020c 08000099		j	rule_3_end
+ 220 0210               tree_after:					# north
+ 221 0210 224AFFFF		addi	$t2, $s2, -1			# grid boundary
+ 222 0214 22290001		addi	$t1, $s1, 1
+ 223 0218 0149402A		slt	$t0, $t2, $t1			# 1 = val is to large, skip
+ 224 021c 15000011		bne	$t0, $zero, rule_3_end
+ 225 0220               #
+ 226 0220               # check if y + 1 is grass
+ 227 0220               #
+ 228 0220 02002021		move	$a0, $s0
+ 229 0224 01202821		move	$a1, $t1
+ 230 0228 0C000000		jal	grid_get_old
+ 231 022c 34090001		li	$t1, 1
+ 232 0230 1049000A		beq	$v0, $t1, rule_3_tree
+ 233 0234 08000099		j	rule_3_end
+ 234 0238               tree_before:					# south
+ 235 0238 2229FFFF		addi	$t1, $s1, -1
+ 236 023c 0220402A		slt	$t0, $s1, $zero			# 1 = val is neg, we skip
+ 237 0240 15000008		bne	$t0, $zero, rule_3_end
+ 238 0244               #
+ 239 0244               # check if y - 1 is grass
+ 240 0244               #
+ 241 0244 02002021		move	$a0, $s0
+ 242 0248 01202821		move	$a1, $t1
+ 243 024c 0C000000		jal	grid_get_old
+ 244 0250 34090001		li	$t1, 1
+ 245 0254 10490001		beq	$v0, $t1, rule_3_tree
+ 246 0258 08000099		j	rule_3_end
+ 247 025c               rule_3_tree:
+ 248 025c 34060002		li	$a2, 2
+ 249 0260 0C000000		jal	grid_set
+ 250 0264               
+ 251 0264               rule_3_end:
+ 252 0264 8FB00000		lw	$s0, 0($sp)
+ 253 0268 8FB10004		lw	$s1, 4($sp)
+ 254 026c 8FB20008		lw	$s2, 8($sp)
+ 255 0270 8FB3000C		lw	$s3, 12($sp)
+ 256 0274 8FBF0010		lw	$ra, 16($sp)
+ 257 0278 23BD0014		addi	$sp, $sp, 20	
+ 258 027c 03E00008		jr	$ra
+ 259 0280               
 
 
 check_after      000000F8 R  text 

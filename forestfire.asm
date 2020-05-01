@@ -91,33 +91,9 @@ error_char:
 	j	error_end
 error_end:
 	syscall
-
-
-	#li	$v0, PRINT_STRING
-	#la	$a0, input_failed_text
-	#syscall
-
-	#li	$v0, PRINT_INT
-	#move	$a0, $v1
-	#syscall
-	
-	#li	$v0, PRINT_STRING
-	#la	$a0, newline
-	#syscall
 	j	main_done
 input_success:
-	move	$t1, $v0			# print success message
-	#li	$v0, PRINT_STRING
-	#la	$a0, input_success_text
-	#syscall
-
-	#li	$v0, PRINT_INT			# print address
-	#move	$a0, $t1
-	#syscall
-	
-	#li	$v0, PRINT_STRING
-	#la	$a0, newline
-	#syscall
+	move	$t1, $v0			# save grid address	
 main_loop_start:
 	jal	grid_create			# create the grid
 	move	$s7, $v0			# grid address
@@ -127,12 +103,16 @@ main_loop_start:
 	lw	$s3, 8($t1)			# wind
 	jal	grid_cycle			# cycle the grid
 main_loop:
-	# print
+#
+# print
+#
 	move	$a0, $s7
 	move	$a1, $s0
 	move	$a2, $s1
 	jal	print_grid
-	# loop over all grid spaces
+#	
+# loop over all grid spaces
+#
 	li	$s4, 0				# x counter
 	li	$s5, -1				# y counter
 grid_loop_outer:
@@ -140,17 +120,22 @@ grid_loop_outer:
 	li	$s4, 0				# reset x counter
 	beq	$s5, $s1, grid_loop_end
 grid_loop_inner:
-	
-	# apple rule 1
+#	
+# apple rule 1
+#
 	move	$a0, $s4
 	move	$a1, $s5
 	jal	rule_1
-	# apply rule 2
+#
+# apply rule 2
+#
 	move	$a0, $s4
 	move	$a1, $s5
 	move	$a2, $s1
 	jal	rule_2
-	# apply rule 3
+#
+# apply rule 3
+#
 	move	$a0, $s4
 	move	$a1, $s5
 	move	$a2, $s1
@@ -161,12 +146,9 @@ grid_loop_inner:
 	beq	$s4, $s1, grid_loop_outer
 	j	grid_loop_inner
 grid_loop_end:
-	# copy generation
-	jal	grid_cycle	
-	# loop
-	beq	$s0, $s2, main_done
-	# increment
-	addi	$s0, $s0, 1
+	jal	grid_cycle			# copy generation
+	beq	$s0, $s2, main_done		# loop
+	addi	$s0, $s0, 1			# increment
 	j	main_loop
 	
 main_done:

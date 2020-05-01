@@ -121,95 +121,77 @@
   91 0084 08000022		j	error_end
   92 0088               error_end:
   93 0088 0000000C		syscall
-  94 008c               
-  95 008c               
-  96 008c               	#li	$v0, PRINT_STRING
-  97 008c               	#la	$a0, input_failed_text
-  98 008c               	#syscall
-  99 008c               
- 100 008c               	#li	$v0, PRINT_INT
- 101 008c               	#move	$a0, $v1
- 102 008c               	#syscall
- 103 008c               	
- 104 008c               	#li	$v0, PRINT_STRING
- 105 008c               	#la	$a0, newline
- 106 008c               	#syscall
- 107 008c 08000048		j	main_done
- 108 0090               input_success:
- 109 0090 00404821		move	$t1, $v0			# print success message
- 110 0094               	#li	$v0, PRINT_STRING
- 111 0094               	#la	$a0, input_success_text
- 112 0094               	#syscall
- 113 0094               
- 114 0094               	#li	$v0, PRINT_INT			# print address
- 115 0094               	#move	$a0, $t1
- 116 0094               	#syscall
- 117 0094               	
- 118 0094               	#li	$v0, PRINT_STRING
- 119 0094               	#la	$a0, newline
- 120 0094               	#syscall
- 121 0094               main_loop_start:
- 122 0094 0C000000		jal	grid_create			# create the grid
- 123 0098 0040B821		move	$s7, $v0			# grid address
- 124 009c 34100000		li	$s0, 0 				# generations counter
- 125 00a0 8D310000		lw	$s1, 0($t1)			# size
- 126 00a4 8D320004		lw	$s2, 4($t1)			# generations
- 127 00a8 8D330008		lw	$s3, 8($t1)			# wind
- 128 00ac 0C000000		jal	grid_cycle			# cycle the grid
- 129 00b0               main_loop:
- 130 00b0               	# print
- 131 00b0 02E02021		move	$a0, $s7
- 132 00b4 02002821		move	$a1, $s0
- 133 00b8 02203021		move	$a2, $s1
- 134 00bc 0C000000		jal	print_grid
- 135 00c0               	# loop over all grid spaces
- 136 00c0 34140000		li	$s4, 0				# x counter
- 137 00c4 2415FFFF		li	$s5, -1				# y counter
- 138 00c8               grid_loop_outer:
- 139 00c8 22B50001		addi	$s5, $s5, 1
- 140 00cc 34140000		li	$s4, 0				# reset x counter
- 141 00d0 12B1000F		beq	$s5, $s1, grid_loop_end
- 142 00d4               grid_loop_inner:
- 143 00d4               	
- 144 00d4               	# apple rule 1
- 145 00d4 02802021		move	$a0, $s4
- 146 00d8 02A02821		move	$a1, $s5
- 147 00dc 0C000000		jal	rule_1
- 148 00e0               	# apply rule 2
- 149 00e0 02802021		move	$a0, $s4
- 150 00e4 02A02821		move	$a1, $s5
- 151 00e8 02203021		move	$a2, $s1
- 152 00ec 0C000000		jal	rule_2
- 153 00f0               	# apply rule 3
- 154 00f0 02802021		move	$a0, $s4
- 155 00f4 02A02821		move	$a1, $s5
- 156 00f8 02203021		move	$a2, $s1
- 157 00fc 02603821		move	$a3, $s3
- 158 0100 0C000000		jal	rule_3
- 159 0104               
- 160 0104 22940001		addi	$s4, $s4, 1
- 161 0108 1291FFEF		beq	$s4, $s1, grid_loop_outer
- 162 010c 08000035		j	grid_loop_inner
- 163 0110               grid_loop_end:
- 164 0110               	# copy generation
- 165 0110 0C000000		jal	grid_cycle	
- 166 0114               	# loop
- 167 0114 12120002		beq	$s0, $s2, main_done
- 168 0118               	# increment
- 169 0118 22100001		addi	$s0, $s0, 1
- 170 011c 0800002C		j	main_loop
- 171 0120               	
- 172 0120               main_done:
- 173 0120 8FB10000		lw	$s1, 0($sp)
- 174 0124 8FB20004		lw	$s2, 4($sp)
- 175 0128 8FB30008		lw	$s3, 8($sp)
- 176 012c 8FB4000C		lw	$s4, 12($sp)
- 177 0130 8FB50010		lw	$s5, 16($sp)
- 178 0134 8FB60014		lw	$s6, 20($sp)
- 179 0138 8FB70018		lw	$s7, 24($sp)
- 180 013c 8FBF001C		lw	$ra, 28($sp)
- 181 0140 23BD0020		addi	$sp, $sp, 32
- 182 0144 03E00008		jr	$ra
+  94 008c 08000048		j	main_done
+  95 0090               input_success:
+  96 0090 00404821		move	$t1, $v0			# save grid address	
+  97 0094               main_loop_start:
+  98 0094 0C000000		jal	grid_create			# create the grid
+  99 0098 0040B821		move	$s7, $v0			# grid address
+ 100 009c 34100000		li	$s0, 0 				# generations counter
+ 101 00a0 8D310000		lw	$s1, 0($t1)			# size
+ 102 00a4 8D320004		lw	$s2, 4($t1)			# generations
+ 103 00a8 8D330008		lw	$s3, 8($t1)			# wind
+ 104 00ac 0C000000		jal	grid_cycle			# cycle the grid
+ 105 00b0               main_loop:
+ 106 00b0               #
+ 107 00b0               # print
+ 108 00b0               #
+ 109 00b0 02E02021		move	$a0, $s7
+ 110 00b4 02002821		move	$a1, $s0
+ 111 00b8 02203021		move	$a2, $s1
+ 112 00bc 0C000000		jal	print_grid
+ 113 00c0               #	
+ 114 00c0               # loop over all grid spaces
+ 115 00c0               #
+ 116 00c0 34140000		li	$s4, 0				# x counter
+ 117 00c4 2415FFFF		li	$s5, -1				# y counter
+ 118 00c8               grid_loop_outer:
+ 119 00c8 22B50001		addi	$s5, $s5, 1
+ 120 00cc 34140000		li	$s4, 0				# reset x counter
+ 121 00d0 12B1000F		beq	$s5, $s1, grid_loop_end
+ 122 00d4               grid_loop_inner:
+ 123 00d4               #	
+ 124 00d4               # apple rule 1
+ 125 00d4               #
+ 126 00d4 02802021		move	$a0, $s4
+ 127 00d8 02A02821		move	$a1, $s5
+ 128 00dc 0C000000		jal	rule_1
+ 129 00e0               #
+ 130 00e0               # apply rule 2
+ 131 00e0               #
+ 132 00e0 02802021		move	$a0, $s4
+ 133 00e4 02A02821		move	$a1, $s5
+ 134 00e8 02203021		move	$a2, $s1
+ 135 00ec 0C000000		jal	rule_2
+ 136 00f0               #
+ 137 00f0               # apply rule 3
+ 138 00f0               #
+ 139 00f0 02802021		move	$a0, $s4
+ 140 00f4 02A02821		move	$a1, $s5
+ 141 00f8 02203021		move	$a2, $s1
+ 142 00fc 02603821		move	$a3, $s3
+ 143 0100 0C000000		jal	rule_3
+ 144 0104               
+ 145 0104 22940001		addi	$s4, $s4, 1
+ 146 0108 1291FFEF		beq	$s4, $s1, grid_loop_outer
+ 147 010c 08000035		j	grid_loop_inner
+ 148 0110               grid_loop_end:
+ 149 0110 0C000000		jal	grid_cycle			# copy generation
+ 150 0114 12120002		beq	$s0, $s2, main_done		# loop
+ 151 0118 22100001		addi	$s0, $s0, 1			# increment
+ 152 011c 0800002C		j	main_loop
+ 153 0120               	
+ 154 0120               main_done:
+ 155 0120 8FB10000		lw	$s1, 0($sp)
+ 156 0124 8FB20004		lw	$s2, 4($sp)
+ 157 0128 8FB30008		lw	$s3, 8($sp)
+ 158 012c 8FB4000C		lw	$s4, 12($sp)
+ 159 0130 8FB50010		lw	$s5, 16($sp)
+ 160 0134 8FB60014		lw	$s6, 20($sp)
+ 161 0138 8FB70018		lw	$s7, 24($sp)
+ 162 013c 8FBF001C		lw	$ra, 28($sp)
+ 163 0140 23BD0020		addi	$sp, $sp, 32
+ 164 0144 03E00008		jr	$ra
 
 
 PRINT_INT           = 00000001   
